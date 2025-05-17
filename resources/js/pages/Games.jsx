@@ -22,7 +22,6 @@ export function Games() {
     });
     const [showUnderConstruction, setShowUnderConstruction] = useState(true);
 
-    // Estados para controlar los filtros desplegables
     const [genresOpen, setGenresOpen] = useState(true);
     const [platformsOpen, setPlatformsOpen] = useState(true);
     const [storesOpen, setStoresOpen] = useState(true);
@@ -32,7 +31,6 @@ export function Games() {
     const location = useLocation();
 
     useEffect(() => {
-        // Parse query parameters from URL
         const params = new URLSearchParams(location.search);
         const query = params.get("search") || "";
         const genreIds = params.get("genres")?.split(",").filter(Boolean) || [];
@@ -46,7 +44,6 @@ export function Games() {
         setSelectedPlatforms(platformIds);
         setSelectedStores(storeIds);
 
-        // Load filters and games
         loadFilters();
         searchGames(query, genreIds, platformIds, storeIds, page);
     }, [location.search]);
@@ -78,7 +75,6 @@ export function Games() {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-
             if (query) params.append("search", query);
             if (genreIds.length > 0)
                 params.append("genres", genreIds.join(","));
@@ -91,7 +87,6 @@ export function Games() {
             const response = await axios.get(
                 `/api/games/filter?${params.toString()}`
             );
-
             setGames(response.data.games);
             setPagination({
                 currentPage: response.data.currentPage,
@@ -105,14 +100,8 @@ export function Games() {
         }
     };
 
-    const handleSearch = () => {
-        updateSearchParams();
-    };
-
-    const handleInputChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
-
+    const handleSearch = () => updateSearchParams();
+    const handleInputChange = (e) => setSearchQuery(e.target.value);
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
@@ -146,7 +135,6 @@ export function Games() {
 
     const updateSearchParams = () => {
         const params = new URLSearchParams();
-
         if (searchQuery) params.append("search", searchQuery);
         if (selectedGenres.length > 0)
             params.append("genres", selectedGenres.join(","));
@@ -154,7 +142,7 @@ export function Games() {
             params.append("platforms", selectedPlatforms.join(","));
         if (selectedStores.length > 0)
             params.append("stores", selectedStores.join(","));
-        params.append("page", "1"); // Reset to first page on new search
+        params.append("page", "1");
 
         navigate(`/games?${params.toString()}`);
     };
@@ -165,62 +153,48 @@ export function Games() {
         navigate(`/games?${params.toString()}`);
     };
 
-    const applyFilters = () => {
-        updateSearchParams();
-    };
-
-    // Toggle para dispositivos móviles
-    const toggleMobileFilters = () => {
-        setFiltersOpen(!filtersOpen);
-    };
+    const applyFilters = () => updateSearchParams();
+    const toggleMobileFilters = () => setFiltersOpen(!filtersOpen);
 
     return (
-        <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 relative">
-            {/* Overlay de "Under Construction" - Versión con texto e imagen */}
-            {showUnderConstruction && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4">
-                    <div className="relative bg-white dark:bg-gray-800 p-8 rounded-lg max-w-2xl w-full text-center shadow-2xl">
-                
-                        {/* <div className="mb-6 flex justify-center">
-                            <img
-                                src="/images/under-construction.png"
-                                alt="Under Construction"
-                                className="h-32 w-auto object-contain"
-                            />
-                        </div> */}
+        <div className="container mx-auto px-4 py-8 bg-lightBg dark:bg-darkBg relative">
+            {/* Under Construction Modal */}
+            {/* Under Construction Modal */}
+{showUnderConstruction && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <div className="relative bg-white dark:bg-header p-6 rounded-lg max-w-2xl w-full text-center shadow-xl">
+            <div className="mb-4 flex justify-center w-full">
+                <img
+                    src="/images/404.png"
+                    alt="Under construction"
+                    className="max-h-[400px] object-contain" // Tamaño aumentado
+                />
+            </div>
+            <p className="text-lg text-textLight dark:text-textDark mb-6">
+                I'm working hard to improve your experience. Please
+                check back soon!
+            </p>
+            <button
+                onClick={() => setShowUnderConstruction(false)}
+                className="bg-heading hover:bg-[#E00050] text-white font-bold py-2 px-6 rounded-full transition-colors"
+            >
+                I understand, show me anyway
+            </button>
+        </div>
+    </div>
+)}
 
-                        <h2 className="text-5xl font-bold mb-6 text-red-500 dark:text-red-400 animate-pulse">
-                            UNDER CONSTRUCTION :)
-                        </h2>
-                        <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">
-                            I'm working hard to improve your experience. Please
-                            check back soon!
-                        </p>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-                            <p>This section is temporarily unavailable</p>
-                        </div>
-
-                        <button
-                            onClick={() => setShowUnderConstruction(false)}
-                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300"
-                        >
-                            I understand, show me anyway
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold mb-6 text-heading dark:text-textDark">
                 Games
             </h1>
 
-            {/* Botón para mostrar/ocultar filtros en móvil */}
+            {/* Mobile Filters Toggle */}
             <div className="md:hidden mb-4">
                 <button
                     onClick={toggleMobileFilters}
-                    className="w-full flex items-center justify-between p-3 bg-gray-200 dark:bg-gray-800 rounded-lg"
+                    className="w-full flex items-center justify-between p-3 bg-gray-200 dark:bg-gray-700 rounded-lg"
                 >
-                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                    <span className="font-medium text-textLight dark:text-textDark">
                         Filters
                     </span>
                     <ChevronDown
@@ -232,18 +206,18 @@ export function Games() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-6">
-                {/* Filtros - ocultos en móvil por defecto */}
+                {/* Filters Section */}
                 <div
                     className={`w-full md:w-1/4 ${
                         filtersOpen ? "block" : "hidden"
                     } md:block`}
                 >
-                    <div className="bg-gray-200 dark:bg-gray-800 p-4 rounded-lg shadow">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                    <div className="bg-white dark:bg-header p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                        <h2 className="text-xl font-semibold mb-4 text-heading dark:text-textDark">
                             Filters
                         </h2>
 
-                        {/* Search bar */}
+                        {/* Search Bar */}
                         <div className="mb-6">
                             <form
                                 onSubmit={(e) => {
@@ -255,27 +229,22 @@ export function Games() {
                                 <input
                                     type="text"
                                     placeholder="Search games..."
-                                    className="w-full p-2 pl-10 border rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                                    className="w-full p-2 pl-10 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-textLight dark:text-textDark focus:ring-2 focus:ring-heading focus:border-transparent"
                                     value={searchQuery}
                                     onChange={handleInputChange}
                                     onKeyDown={handleKeyDown}
                                 />
-                                <button
-                                    type="submit"
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                                >
-                                    <Search className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                </button>
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                             </form>
                         </div>
 
-                        {/* Genre filters - desplegable */}
-                        <div className="mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
+                        {/* Genre Filters */}
+                        <div className="mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
                             <div
                                 className="flex items-center justify-between cursor-pointer"
                                 onClick={() => setGenresOpen(!genresOpen)}
                             >
-                                <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
+                                <h3 className="font-medium text-heading dark:text-textDark mb-2">
                                     Genres
                                 </h3>
                                 <ChevronDown
@@ -302,11 +271,11 @@ export function Games() {
                                                         genre.id.toString()
                                                     )
                                                 }
-                                                className="mr-2"
+                                                className="mr-2 rounded text-heading focus:ring-heading"
                                             />
                                             <label
                                                 htmlFor={`genre-${genre.id}`}
-                                                className="text-gray-700 dark:text-gray-300"
+                                                className="text-textLight dark:text-textDark"
                                             >
                                                 {genre.name} (
                                                 {genre.games_count || 0})
@@ -317,13 +286,13 @@ export function Games() {
                             )}
                         </div>
 
-                        {/* Platform filters - desplegable */}
-                        <div className="mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
+                        {/* Platform Filters */}
+                        <div className="mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
                             <div
                                 className="flex items-center justify-between cursor-pointer"
                                 onClick={() => setPlatformsOpen(!platformsOpen)}
                             >
-                                <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
+                                <h3 className="font-medium text-heading dark:text-textDark mb-2">
                                     Platforms
                                 </h3>
                                 <ChevronDown
@@ -350,11 +319,11 @@ export function Games() {
                                                         platform.id.toString()
                                                     )
                                                 }
-                                                className="mr-2"
+                                                className="mr-2 rounded text-heading focus:ring-heading"
                                             />
                                             <label
                                                 htmlFor={`platform-${platform.id}`}
-                                                className="text-gray-700 dark:text-gray-300"
+                                                className="text-textLight dark:text-textDark"
                                             >
                                                 {platform.name} (
                                                 {platform.games_count || 0})
@@ -365,13 +334,13 @@ export function Games() {
                             )}
                         </div>
 
-                        {/* Store filters - desplegable */}
+                        {/* Store Filters */}
                         <div className="mb-4">
                             <div
                                 className="flex items-center justify-between cursor-pointer"
                                 onClick={() => setStoresOpen(!storesOpen)}
                             >
-                                <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
+                                <h3 className="font-medium text-heading dark:text-textDark mb-2">
                                     Stores
                                 </h3>
                                 <ChevronDown
@@ -398,11 +367,11 @@ export function Games() {
                                                         store.id.toString()
                                                     )
                                                 }
-                                                className="mr-2"
+                                                className="mr-2 rounded text-heading focus:ring-heading"
                                             />
                                             <label
                                                 htmlFor={`store-${store.id}`}
-                                                className="text-gray-700 dark:text-gray-300"
+                                                className="text-textLight dark:text-textDark"
                                             >
                                                 {store.name} (
                                                 {store.games_count || 0})
@@ -415,27 +384,27 @@ export function Games() {
 
                         <button
                             onClick={applyFilters}
-                            className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition"
+                            className="w-full bg-heading hover:bg-[#E00050] text-white py-2 rounded-lg transition-colors"
                         >
                             Apply Filters
                         </button>
                     </div>
                 </div>
 
-                {/* Games grid */}
+                {/* Games Grid */}
                 <div className="w-full md:w-3/4">
                     {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[...Array(6)].map((_, i) => (
                                 <div
                                     key={i}
-                                    className="h-64 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse"
+                                    className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
                                 ></div>
                             ))}
                         </div>
                     ) : games.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {games.map((game) => (
                                     <GameCardSimple key={game.id} game={game} />
                                 ))}
@@ -443,8 +412,8 @@ export function Games() {
 
                             {/* Pagination */}
                             {pagination.totalPages > 1 && (
-                                <div className="flex justify-center mt-8">
-                                    <div className="flex gap-2">
+                                <div className="flex justify-center mt-6">
+                                    <div className="flex gap-1">
                                         {Array.from(
                                             { length: pagination.totalPages },
                                             (_, i) => i + 1
@@ -454,11 +423,11 @@ export function Games() {
                                                 onClick={() =>
                                                     handlePageChange(page)
                                                 }
-                                                className={`px-4 py-2 rounded-md ${
+                                                className={`px-3 py-1 rounded-md ${
                                                     pagination.currentPage ===
                                                     page
-                                                        ? "bg-purple-600 text-white"
-                                                        : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                                        ? "bg-heading text-white"
+                                                        : "bg-gray-200 dark:bg-gray-700 text-textLight dark:text-textDark hover:bg-gray-300 dark:hover:bg-gray-600"
                                                 }`}
                                             >
                                                 {page}
@@ -469,8 +438,8 @@ export function Games() {
                             )}
                         </>
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-64 bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
-                            <p className="text-lg text-gray-700 dark:text-gray-300">
+                        <div className="flex flex-col items-center justify-center h-64 bg-white dark:bg-header rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+                            <p className="text-lg text-textLight dark:text-textDark">
                                 No games found matching your criteria.
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">

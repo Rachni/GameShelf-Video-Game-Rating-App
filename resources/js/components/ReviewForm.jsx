@@ -95,16 +95,16 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
     };
 
     return (
-        <div className="mt-6 p-8 rounded-xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
+        <div className="mt-6 p-8 rounded-xl bg-lightBg dark:bg-darkBg shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
             <div className="flex items-start mb-6">
-                <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg mr-4">
-                    <Star className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                <div className="bg-interactive/10 p-3 rounded-lg mr-4">
+                    <Star className="h-6 w-6 text-interactive" />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-2xl font-bold text-textLight dark:text-textDark">
                         Share Your Experience
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-textLight/70 dark:text-textDark/70 mt-1">
                         Help others by sharing your thoughts about this game
                     </p>
                 </div>
@@ -112,7 +112,7 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label className="block text-sm font-semibold text-textLight/80 dark:text-textDark/80">
                         Your Rating
                     </label>
                     <div className="flex items-center space-x-1">
@@ -136,7 +136,7 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
                                 />
                             </button>
                         ))}
-                        <span className="ml-4 text-lg font-medium text-gray-700 dark:text-gray-300">
+                        <span className="ml-4 text-lg font-medium text-textLight dark:text-textDark">
                             {rating > 0
                                 ? `${rating} ${rating === 1 ? "star" : "stars"}`
                                 : "Not rated"}
@@ -147,7 +147,7 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
                 <div className="space-y-2">
                     <label
                         htmlFor="review-text"
-                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-semibold text-textLight/80 dark:text-textDark/80"
                     >
                         Your Detailed Review
                     </label>
@@ -155,13 +155,13 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
                         <textarea
                             id="review-text"
                             rows={5}
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-500 dark:focus:border-indigo-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                            className="w-full px-4 py-3 bg-lightBg/50 dark:bg-darkBg/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-interactive focus:border-interactive text-textLight dark:text-textDark placeholder-textLight/50 dark:placeholder-textDark/50 transition-all duration-200"
                             placeholder="What did you like or dislike about this game? Would you recommend it?"
                             value={reviewText}
                             onChange={(e) => setReviewText(e.target.value)}
                             required
                         />
-                        <div className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-gray-500 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded">
+                        <div className="absolute bottom-3 right-3 text-xs text-textLight/50 dark:text-textDark/50 bg-lightBg/80 dark:bg-darkBg/80 px-2 py-1 rounded">
                             {reviewText.length}/1000
                         </div>
                     </div>
@@ -170,21 +170,21 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
                 <div className="flex justify-between items-center pt-2">
                     {user ? (
                         <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
-                                <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                            <div className="w-8 h-8 rounded-full bg-interactive/10 flex items-center justify-center mr-3">
+                                <span className="text-sm font-medium text-interactive">
                                     {user.name?.charAt(0) ||
                                         user.email?.charAt(0)}
                                 </span>
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-textLight/70 dark:text-textDark/70">
                                 Posting as{" "}
-                                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                <span className="font-semibold text-interactive">
                                     {user.name || user.email}
                                 </span>
                             </span>
                         </div>
                     ) : (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-textLight/60 dark:text-textDark/60">
                             Please sign in to submit a review
                         </div>
                     )}
@@ -192,7 +192,7 @@ export function ReviewForm({ gameId, onReviewSubmit }) {
                     <button
                         type="submit"
                         disabled={isSubmitting || !user}
-                        className=" inline-flex items-center px-6 py-3 bg-gradient-to-l from-[#FF0059] to-[#00ADB5] hover:from-[#FF0059] hover:to-[#00ADB5] text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-heading to-interactive text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
                             <>

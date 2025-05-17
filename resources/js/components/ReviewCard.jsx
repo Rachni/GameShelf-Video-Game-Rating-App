@@ -16,7 +16,6 @@ export function ReviewCard({
     const [likes, setLikes] = useState(review.likes || 0);
     const [isLiked, setIsLiked] = useState(false);
 
-    // Función segura para formatear la fecha
     const formatDate = (dateString) => {
         if (!dateString) return null;
 
@@ -58,8 +57,8 @@ export function ReviewCard({
             className={`rounded-2xl p-6 mb-6 transition-all duration-300
             ${
                 theme === "dark"
-                    ? "bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700"
-                    : "bg-gradient-to-br from-white to-gray-50 border-gray-200"
+                    ? "bg-darkBg border-gray-700"
+                    : "bg-lightBg border-gray-200"
             }
             shadow-lg hover:shadow-xl border`}
         >
@@ -70,7 +69,7 @@ export function ReviewCard({
                         to={`/games/${review.game.slug}`}
                         className="flex-shrink-0 transition-transform hover:scale-105"
                     >
-                        <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-accent-500/20">
+                        <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-interactive/20">
                             <img
                                 src={
                                     review.game.image_url ||
@@ -88,14 +87,14 @@ export function ReviewCard({
                     {showGame && (
                         <Link
                             to={`/games/${review.game.slug}`}
-                            className="font-semibold text-lg text-gray-800 dark:text-white hover:text-accent-500 dark:hover:text-accent-400 transition-colors"
+                            className="font-semibold text-lg text-textLight dark:text-textDark hover:text-interactive transition-colors"
                         >
                             {review.game.name}
                         </Link>
                     )}
 
                     {/* Review Content */}
-                    <p className="my-3 text-gray-700 dark:text-gray-300">
+                    <p className="my-3 text-textLight/80 dark:text-textDark/80">
                         {review.text}
                     </p>
 
@@ -112,7 +111,7 @@ export function ReviewCard({
                                 } mr-1`}
                             />
                         ))}
-                        <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <span className="ml-2 text-sm font-medium text-textLight/60 dark:text-textDark/60">
                             {review.star_rating.toFixed(1)}
                         </span>
                     </div>
@@ -126,11 +125,11 @@ export function ReviewCard({
                             className="flex items-center gap-2 group"
                         >
                             <div className="text-right">
-                                <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-accent-500 transition-colors">
+                                <span className="font-medium text-textLight dark:text-textDark group-hover:text-interactive transition-colors">
                                     {review.user.name}
                                 </span>
                                 {formattedDate && (
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    <div className="text-xs text-textLight/60 dark:text-textDark/60">
                                         {formattedDate}
                                     </div>
                                 )}
@@ -142,9 +141,9 @@ export function ReviewCard({
                                         "/placeholder.svg?height=40&width=40"
                                     }
                                     alt={review.user.name}
-                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 group-hover:border-accent-500 transition-all"
+                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 group-hover:border-interactive transition-all"
                                 />
-                                <div className="absolute inset-0 rounded-full bg-accent-500/0 group-hover:bg-accent-500/10 transition-all -z-10"></div>
+                                <div className="absolute inset-0 rounded-full bg-interactive/0 group-hover:bg-interactive/10 transition-all -z-10"></div>
                             </div>
                         </Link>
                     </div>
@@ -158,15 +157,15 @@ export function ReviewCard({
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-all
                         ${
                             isLiked
-                                ? "bg-accent-500/10 text-accent-600 dark:text-accent-400 ring-1 ring-accent-500/30"
-                                : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                ? "bg-interactive/10 text-interactive ring-1 ring-interactive/30"
+                                : "text-textLight/60 dark:text-textDark/60 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }
                         hover:scale-105 active:scale-95
                     `}
                 >
                     <ThumbsUp
                         size={18}
-                        className={isLiked ? "fill-accent-500" : ""}
+                        className={isLiked ? "fill-interactive" : ""}
                     />
                     <span className="font-medium">{likes}</span>
                 </button>

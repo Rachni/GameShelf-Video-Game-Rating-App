@@ -10,8 +10,8 @@ export function Footer() {
         <footer
             className={`py-12 ${
                 theme === "dark"
-                    ? "bg-gradient-to-b from-gray-900 to-gray-800 text-gray-300"
-                    : "bg-gradient-to-b from-gray-100 to-gray-200 text-gray-700"
+                    ? "bg-header text-textDark" // Fondo azul oscuro y texto claro en modo noche
+                    : "bg-lightBg text-textLight" // Fondo blanco y texto oscuro en modo día
             }`}
         >
             <div className="container mx-auto px-4">
@@ -22,14 +22,20 @@ export function Footer() {
                             <img
                                 src="/images/logo.png"
                                 alt="Logo"
-                                className="w-25 h-10"
+                                className="w-40"
                             />
                         </Link>
                         <p className="mt-2 text-sm max-w-xs">
                             Track, rate, and discover your next favorite video
                             game.
                         </p>
-                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p
+                            className={`mt-1 text-xs ${
+                                theme === "dark"
+                                    ? "text-textDark/70"
+                                    : "text-textLight/70"
+                            }`}
+                        >
                             Developed by Rachni
                         </p>
                     </div>
@@ -43,7 +49,11 @@ export function Footer() {
                                 <li>
                                     <Link
                                         to="/"
-                                        className="text-sm hover:text-primary transition-colors duration-300"
+                                        className={`text-sm hover:text-interactive transition-colors duration-300 ${
+                                            theme === "dark"
+                                                ? "text-textDark"
+                                                : "text-textLight"
+                                        }`}
                                     >
                                         Home
                                     </Link>
@@ -51,7 +61,11 @@ export function Footer() {
                                 <li>
                                     <Link
                                         to="/search"
-                                        className="text-sm hover:text-primary transition-colors duration-300"
+                                        className={`text-sm hover:text-interactive transition-colors duration-300 ${
+                                            theme === "dark"
+                                                ? "text-textDark"
+                                                : "text-textLight"
+                                        }`}
                                     >
                                         Browse Games
                                     </Link>
@@ -59,7 +73,11 @@ export function Footer() {
                                 <li>
                                     <a
                                         href="#"
-                                        className="text-sm hover:text-primary transition-colors duration-300"
+                                        className={`text-sm hover:text-interactive transition-colors duration-300 ${
+                                            theme === "dark"
+                                                ? "text-textDark"
+                                                : "text-textLight"
+                                        }`}
                                     >
                                         About
                                     </a>
@@ -67,7 +85,11 @@ export function Footer() {
                                 <li>
                                     <a
                                         href="#"
-                                        className="text-sm hover:text-primary transition-colors duration-300"
+                                        className={`text-sm hover:text-interactive transition-colors duration-300 ${
+                                            theme === "dark"
+                                                ? "text-textDark"
+                                                : "text-textLight"
+                                        }`}
                                     >
                                         Privacy Policy
                                     </a>
@@ -77,13 +99,25 @@ export function Footer() {
 
                         {/* Redes sociales */}
                         <div>
-                            <h3 className="font-semibold mb-4">Connect</h3>
+                            <h3
+                                className={`font-semibold mb-4 ${
+                                    theme === "dark"
+                                        ? "text-textDark"
+                                        : "text-textLight"
+                                }`}
+                            >
+                                Connect
+                            </h3>
                             <div className="flex space-x-4">
                                 <a
                                     href="https://github.com/Rachni"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="hover:text-primary transition-colors duration-300"
+                                    className={`hover:text-interactive transition-colors duration-300 ${
+                                        theme === "dark"
+                                            ? "text-textDark"
+                                            : "text-textLight"
+                                    }`}
                                     aria-label="GitHub"
                                 >
                                     <Github size={24} />
@@ -94,7 +128,17 @@ export function Footer() {
                 </div>
 
                 {/* Derechos de autor */}
-                <div className="mt-12 pt-8 border-t border-gray-700 dark:border-gray-600 text-center text-sm">
+                <div
+                    className={`mt-12 pt-8 border-t ${
+                        theme === "dark"
+                            ? "border-header/30"
+                            : "border-gray-200"
+                    } text-center text-sm ${
+                        theme === "dark"
+                            ? "text-textDark/80"
+                            : "text-textLight/80"
+                    }`}
+                >
                     <p>&copy; {currentYear} GameShelf.</p>
                     <p className="mt-1">
                         Powered by{" "}
@@ -102,7 +146,7 @@ export function Footer() {
                             href="https://rawg.io/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:underline transition-colors duration-300"
+                            className="text-interactive hover:underline transition-colors duration-300"
                         >
                             RAWG API
                         </a>

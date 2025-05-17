@@ -9,40 +9,33 @@ module.exports = {
     theme: {
         extend: {
             colors: {
+                // Colores base
+                header: "#2c3e50", // Color principal para el header
+                darkBg: "#1f2833", // Fondo oscuro de la página
+                lightBg: "#e5dfeb", // Fondo claro suave (blanco roto)
+
+                // Colores interactivos
+                interactive: "#00adb5", // Para botones y elementos clickables
+                interactiveHover: "#008b92", // Versión más oscura para hover
+
+                // Colores tipográficos
+                heading: "#ff0059", // Color para encabezados
+                textLight: "#334155", // Texto en modo claro (gris azulado oscuro)
+                textDark: "#e2e8f0", // Texto en modo oscuro (gris claro)
+
+                // Colores de acento y utilidades
+                accent: {
+                    DEFAULT: "#00adb5",
+                    light: "#38f0f1", // Versión clara del turquesa
+                    dark: "#008b92", // Versión oscura para hover
+                },
+
+                // Mantener compatibilidad con componentes existentes
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
-                primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    foreground: "hsl(var(--primary-foreground))",
-                    dark: "#4f46e5", // Retaining existing primary color
-                },
-                secondary: {
-                    DEFAULT: "hsl(var(--secondary))",
-                    foreground: "hsl(var(--secondary-foreground))",
-                },
-                destructive: {
-                    DEFAULT: "hsl(var(--destructive))",
-                    foreground: "hsl(var(--destructive-foreground))",
-                },
-                muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
-                },
-                accent: {
-                    DEFAULT: "hsl(var(--accent))",
-                    foreground: "hsl(var(--accent-foreground))",
-                },
-                popover: {
-                    DEFAULT: "hsl(var(--popover))",
-                    foreground: "hsl(var(--popover-foreground))",
-                },
-                card: {
-                    DEFAULT: "hsl(var(--card))",
-                    foreground: "hsl(var(--card-foreground))",
-                },
             },
             borderRadius: {
                 lg: "var(--radius)",
@@ -58,6 +51,28 @@ module.exports = {
                     xl: "5rem",
                 },
             },
+            // Extender tipografía para usar los colores definidos
+            typography: (theme) => ({
+                DEFAULT: {
+                    css: {
+                        color: theme("colors.textLight"),
+                        h1: { color: theme("colors.heading") },
+                        h2: { color: theme("colors.heading") },
+                        h3: { color: theme("colors.heading") },
+                        a: {
+                            color: theme("colors.interactive"),
+                            "&:hover": {
+                                color: theme("colors.interactiveHover"),
+                            },
+                        },
+                    },
+                },
+                dark: {
+                    css: {
+                        color: theme("colors.textDark"),
+                    },
+                },
+            }),
         },
     },
     plugins: [

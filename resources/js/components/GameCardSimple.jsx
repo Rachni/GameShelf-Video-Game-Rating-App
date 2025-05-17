@@ -35,11 +35,16 @@ export function GameCardSimple({ game, onRemove, className }) {
         setShowConfirm(true);
     };
 
-    const handleConfirmRemove = (e) => {
+    const handleConfirmRemove = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        onRemove(id);
-        setShowConfirm(false);
+        try {
+            await onRemove(id);
+        } catch (error) {
+            console.error("Error removing game:", error);
+        } finally {
+            setShowConfirm(false);
+        }
     };
 
     const handleCancelRemove = (e) => {
@@ -57,12 +62,7 @@ export function GameCardSimple({ game, onRemove, className }) {
                     className
                 )}
                 onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => {
-                    setIsHovering(false);
-                    if (!showConfirm) {
-                        setShowConfirm(false);
-                    }
-                }}
+                onMouseLeave={() => setIsHovering(false)}
                 style={{
                     boxShadow: isHovering
                         ? `0 10px 25px rgba(0,0,0,0.25), 0 0 0 2px ${colors.dominant}40`
@@ -100,24 +100,24 @@ export function GameCardSimple({ game, onRemove, className }) {
                         </div>
                     </div>
 
-                    {/* Botón de eliminar */}
+                    {/* Botón de eliminar - Siempre visible */}
                     {onRemove && (
-                        <div className="absolute top-2 left-2 z-20">
+                        <div className="absolute top-2 right-2 z-20">
                             {showConfirm ? (
                                 <div className="bg-black/80 backdrop-blur-sm p-2 rounded-lg shadow-lg">
                                     <p className="text-white text-xs mb-2">
                                         Remove from list?
                                     </p>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 justify-center">
                                         <button
                                             onClick={handleConfirmRemove}
-                                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded"
+                                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded transition-colors flex-1"
                                         >
                                             Yes
                                         </button>
                                         <button
                                             onClick={handleCancelRemove}
-                                            className="bg-gray-600 hover:bg-gray-700 text-white text-xs px-2 py-1 rounded"
+                                            className="bg-gray-600 hover:bg-gray-700 text-white text-xs px-2 py-1 rounded transition-colors flex-1"
                                         >
                                             No
                                         </button>
@@ -126,10 +126,9 @@ export function GameCardSimple({ game, onRemove, className }) {
                             ) : (
                                 <button
                                     onClick={handleRemoveClick}
-                                    className={`p-2 rounded-full transition-opacity duration-200 ${
-                                        isHovering ? "opacity-100" : "opacity-0"
-                                    } bg-red-600 hover:bg-red-700 text-white`}
+                                    className="p-2 rounded-full transition-all duration-200 opacity-100 scale-100 bg-red-600 hover:bg-red-700 text-white shadow-md hover:scale-110"
                                     title="Remove from list"
+                                    aria-label="Remove game from list"
                                 >
                                     <Trash2 size={16} />
                                 </button>

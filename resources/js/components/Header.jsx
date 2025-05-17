@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { SearchBar } from "./SearchBar";
+import ThemeSwitch from "./ThemeSwitch";
 
 export const Header = ({ toggleSearchBar }) => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -62,15 +63,21 @@ export const Header = ({ toggleSearchBar }) => {
     return (
         <header
             className={`
-            fixed top-0 left-0 right-0 z-50 
-            transition-all duration-300 
-            ${
-                scrolled
-                    ? "shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm"
-                    : "bg-white dark:bg-gray-900"
-            } 
-            border-b border-gray-200 dark:border-gray-700
-        `}
+                fixed top-0 left-0 right-0 z-50 
+                transition-all duration-300 
+                ${
+                    theme === "dark"
+                        ? scrolled
+                            ? "bg-header/95 shadow-lg backdrop-blur-sm"
+                            : "bg-header"
+                        : scrolled
+                        ? "bg-lightBg/95 shadow-lg backdrop-blur-sm"
+                        : "bg-lightBg"
+                }
+                border-b ${
+                    theme === "dark" ? "border-header/20" : "border-gray-200"
+                }
+            `}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
@@ -80,7 +87,7 @@ export const Header = ({ toggleSearchBar }) => {
                             <img
                                 src="/images/logo.png"
                                 alt="Logo"
-                                className="w-25 h-10"
+                                className="w-40"
                             />
                         </Link>
                     </div>
@@ -89,13 +96,21 @@ export const Header = ({ toggleSearchBar }) => {
                     <div className="hidden md:ml-6 md:flex md:items-center md:space-x-8">
                         <Link
                             to="/"
-                            className="text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                theme === "dark"
+                                    ? "text-textDark hover:text-interactive"
+                                    : "text-textLight hover:text-interactive"
+                            }`}
                         >
                             Home
                         </Link>
                         <Link
                             to="/games"
-                            className="text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                theme === "dark"
+                                    ? "text-textDark hover:text-interactive"
+                                    : "text-textLight hover:text-interactive"
+                            }`}
                         >
                             Games
                         </Link>
@@ -106,7 +121,11 @@ export const Header = ({ toggleSearchBar }) => {
                         {/* Search button */}
                         <button
                             onClick={toggleSearchBar}
-                            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                            className={`p-2 rounded-full transition-colors duration-200 ${
+                                theme === "dark"
+                                    ? "text-textDark/80 hover:text-interactive hover:bg-header/10"
+                                    : "text-textLight/80 hover:text-interactive hover:bg-lightBg/10"
+                            }`}
                             aria-label="Search"
                         >
                             <svg
@@ -124,42 +143,11 @@ export const Header = ({ toggleSearchBar }) => {
                             </svg>
                         </button>
 
-                        {/* Theme toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                            aria-label="Toggle theme"
-                        >
-                            {theme === "dark" ? (
-                                <svg
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                                    />
-                                </svg>
-                            )}
-                        </button>
+                        {/* Theme Switch */}
+                        <ThemeSwitch
+                            checked={theme === "dark"}
+                            onChange={toggleTheme}
+                        />
 
                         {/* Profile dropdown */}
                         {isAuthenticated ? (
@@ -170,7 +158,7 @@ export const Header = ({ toggleSearchBar }) => {
                                         className="flex items-center max-w-xs rounded-full focus:outline-none"
                                         aria-label="User menu"
                                     >
-                                        <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-[#FF0059] hover:border-pink-500 transition-colors">
+                                        <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-interactive hover:border-interactiveHover transition-colors">
                                             {user?.avatar ? (
                                                 <img
                                                     src={
@@ -181,7 +169,7 @@ export const Header = ({ toggleSearchBar }) => {
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center bg-gradient-to-r from-[#FF0059] to-pink-500">
+                                                <div className="h-full w-full flex items-center justify-center bg-interactive">
                                                     <span className="text-white text-xs font-bold">
                                                         {user?.name
                                                             .charAt(0)
@@ -194,14 +182,14 @@ export const Header = ({ toggleSearchBar }) => {
                                 </div>
 
                                 {showUserMenu && (
-                                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700">
+                                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-lightBg dark:bg-darkBg ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700">
                                         <div className="py-1">
                                             <Link
                                                 to={`/users/${user?.name}`}
                                                 onClick={() =>
                                                     setShowUserMenu(false)
                                                 }
-                                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                className="block px-4 py-2 text-sm text-textLight dark:text-textDark hover:bg-gray-100 dark:hover:bg-gray-700"
                                             >
                                                 Your Profile
                                             </Link>
@@ -210,7 +198,7 @@ export const Header = ({ toggleSearchBar }) => {
                                                 onClick={() =>
                                                     setShowUserMenu(false)
                                                 }
-                                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                className="block px-4 py-2 text-sm text-textLight dark:text-textDark hover:bg-gray-100 dark:hover:bg-gray-700"
                                             >
                                                 Settings
                                             </Link>
@@ -218,7 +206,7 @@ export const Header = ({ toggleSearchBar }) => {
                                         <div className="py-1">
                                             <button
                                                 onClick={handleLogout}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                className="block w-full text-left px-4 py-2 text-sm text-textLight dark:text-textDark hover:bg-gray-100 dark:hover:bg-gray-700"
                                             >
                                                 Sign out
                                             </button>
@@ -230,13 +218,17 @@ export const Header = ({ toggleSearchBar }) => {
                             <div className="flex items-center space-x-4 ml-4">
                                 <Link
                                     to="/login"
-                                    className="text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 text-sm font-medium transition-colors duration-200"
+                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                        theme === "dark"
+                                            ? "text-textDark hover:text-interactive"
+                                            : "text-textLight hover:text-interactive"
+                                    }`}
                                 >
                                     Sign in
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="px-4 py-2 rounded-md bg-gradient-to-r from-[#FF0059] to-pink-600 text-white text-sm font-medium hover:from-[#E00050] hover:to-pink-700 transition-all duration-200 shadow-sm"
+                                    className="px-4 py-2 rounded-md bg-interactive text-white text-sm font-medium hover:bg-interactiveHover transition-all duration-200 shadow-sm"
                                 >
                                     Sign up
                                 </Link>
@@ -249,7 +241,11 @@ export const Header = ({ toggleSearchBar }) => {
                         <button
                             onClick={toggleMobileMenu}
                             type="button"
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition duration-150 ease-in-out"
+                            className={`md:hidden inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition duration-150 ease-in-out ${
+                                theme === "dark"
+                                    ? "text-textDark/80 hover:text-interactive hover:bg-header/10"
+                                    : "text-textLight/80 hover:text-interactive hover:bg-lightBg/10"
+                            }`}
                             aria-label="Toggle menu"
                         >
                             {showMobileMenu ? (
@@ -288,29 +284,41 @@ export const Header = ({ toggleSearchBar }) => {
 
             {/* Mobile menu */}
             {showMobileMenu && (
-                <div className="md:hidden">
+                <div
+                    className={`md:hidden ${
+                        theme === "dark" ? "bg-header" : "bg-lightBg"
+                    }`}
+                >
                     <div className="pt-2 pb-3 space-y-1">
                         <Link
                             to="/"
                             onClick={() => setShowMobileMenu(false)}
-                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                            className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                theme === "dark"
+                                    ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                    : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                            }`}
                         >
                             Home
                         </Link>
                         <Link
                             to="/games"
                             onClick={() => setShowMobileMenu(false)}
-                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                            className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                theme === "dark"
+                                    ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                    : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                            }`}
                         >
                             Games
                         </Link>
                     </div>
-                    <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="pt-4 pb-3 border-t border-header/20 dark:border-darkBg/30">
                         {isAuthenticated ? (
                             <>
                                 <div className="flex items-center px-5">
                                     <div className="flex-shrink-0">
-                                        <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-[#FF0059]">
+                                        <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-interactive">
                                             {user?.avatar ? (
                                                 <img
                                                     src={
@@ -321,7 +329,7 @@ export const Header = ({ toggleSearchBar }) => {
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center bg-gradient-to-r from-[#FF0059] to-pink-500">
+                                                <div className="h-full w-full flex items-center justify-center bg-interactive">
                                                     <span className="text-white text-sm font-bold">
                                                         {user?.name
                                                             .charAt(0)
@@ -332,7 +340,13 @@ export const Header = ({ toggleSearchBar }) => {
                                         </div>
                                     </div>
                                     <div className="ml-3">
-                                        <div className="text-base font-medium text-gray-800 dark:text-white">
+                                        <div
+                                            className={`text-base font-medium ${
+                                                theme === "dark"
+                                                    ? "text-textDark"
+                                                    : "text-textLight"
+                                            }`}
+                                        >
                                             {user?.name}
                                         </div>
                                     </div>
@@ -341,14 +355,22 @@ export const Header = ({ toggleSearchBar }) => {
                                     <Link
                                         to={`/users/${user?.name}`}
                                         onClick={() => setShowMobileMenu(false)}
-                                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                                        className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                            theme === "dark"
+                                                ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                                : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                                        }`}
                                     >
                                         Your Profile
                                     </Link>
                                     <Link
                                         to="/settings"
                                         onClick={() => setShowMobileMenu(false)}
-                                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                                        className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                            theme === "dark"
+                                                ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                                : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                                        }`}
                                     >
                                         Settings
                                     </Link>
@@ -357,7 +379,11 @@ export const Header = ({ toggleSearchBar }) => {
                                             handleLogout();
                                             setShowMobileMenu(false);
                                         }}
-                                        className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                                        className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                            theme === "dark"
+                                                ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                                : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                                        }`}
                                     >
                                         Sign out
                                     </button>
@@ -368,14 +394,18 @@ export const Header = ({ toggleSearchBar }) => {
                                 <Link
                                     to="/login"
                                     onClick={() => setShowMobileMenu(false)}
-                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:text-[#FF0059] dark:hover:text-pink-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                                        theme === "dark"
+                                            ? "text-textDark hover:text-interactive hover:bg-header/10"
+                                            : "text-textLight hover:text-interactive hover:bg-lightBg/10"
+                                    }`}
                                 >
                                     Sign in
                                 </Link>
                                 <Link
                                     to="/register"
                                     onClick={() => setShowMobileMenu(false)}
-                                    className="block w-full px-3 py-2 rounded-md bg-gradient-to-r from-[#FF0059] to-pink-600 text-white text-base font-medium hover:from-[#E00050] hover:to-pink-700 transition-all duration-200 shadow-sm text-center"
+                                    className="block w-full px-3 py-2 rounded-md bg-interactive text-white text-base font-medium hover:bg-interactiveHover transition-all duration-200 shadow-sm text-center"
                                 >
                                     Sign up
                                 </Link>

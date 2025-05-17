@@ -14,12 +14,12 @@ export function MainLayout() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen relative">
+        <div className="flex flex-col min-h-screen bg-lightBg dark:bg-darkBg relative">
             <Header toggleSearchBar={toggleSearchBar} />
 
             {/* Barra de búsqueda posicionada debajo del header */}
             {showSearchBar && (
-                <div className="fixed top-16 z-[110] w-full flex justify-center px-4 bg-white dark:bg-gray-900 shadow-md">
+                <div className="fixed top-16 z-[110] w-full flex justify-center px-4 bg-lightBg dark:bg-header shadow-md">
                     <div className="w-full max-w-4xl py-2">
                         <SearchBar onClose={toggleSearchBar} />
                     </div>

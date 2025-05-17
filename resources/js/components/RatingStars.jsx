@@ -37,7 +37,7 @@ export function RatingStars({
                 throw new Error("Session expired");
             }
 
-            // 2. Obtener token CSRF si no existe
+            // 2. Obtener token CSRF
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
             // 3. Hacer la petición de rating
@@ -59,29 +59,30 @@ export function RatingStars({
                 }
             );
 
+            // Actualizar el estado con la respuesta completa del servidor
             setRating(value);
             if (onRatingChange) {
+                // Pasar toda la data de la review
                 onRatingChange(value, response.data);
             }
         } catch (error) {
-            console.error("Rating error:", {
-                message: error.message,
-                response: error.response,
-                config: error.config,
-            });
-
+            console.error("Rating error:", error);
             setRating(initialRating);
-            setError(error.response?.data?.message || error.message);
+            
+            const errorMessage = error.response?.data?.message || 
+                              error.response?.data?.error || 
+                              error.message;
+            setError(errorMessage);
 
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
             } else if (error.response?.status === 422) {
                 alert(
                     "Validation error: " +
-                        Object.values(error.response.data.errors).join("\n")
+                    Object.values(error.response.data.errors).flat().join("\n")
                 );
             } else {
-                alert("Failed to save rating. Please try again.");
+                alert(`Failed to save rating: ${errorMessage}`);
             }
         } finally {
             setIsLoading(false);
@@ -89,20 +90,14 @@ export function RatingStars({
     };
 
     const ratingText = () => {
-        switch (rating) {
-            case 1:
-                return "Poor";
-            case 2:
-                return "Fair";
-            case 3:
-                return "Good";
-            case 4:
-                return "Very Good";
-            case 5:
-                return "Excellent";
-            default:
-                return "Rate this game";
-        }
+        const ratings = {
+            1: "Poor",
+            2: "Fair",
+            3: "Good",
+            4: "Very Good",
+            5: "Excellent",
+        };
+        return ratings[rating] || "Rate this game";
     };
 
     return (
@@ -124,11 +119,7 @@ export function RatingStars({
                         <Star
                             size={size}
                             className={`transition-colors duration-150 ${
-                                (
-                                    hoveredRating
-                                        ? hoveredRating >= star
-                                        : rating >= star
-                                )
+                                (hoveredRating || rating) >= star
                                     ? "text-yellow-500 fill-yellow-500"
                                     : "text-gray-300 dark:text-gray-600"
                             } ${isLoading ? "animate-pulse" : ""}`}
@@ -146,7 +137,11 @@ export function RatingStars({
             {isLoading && (
                 <div className="mt-1 text-xs text-gray-500">Saving...</div>
             )}
-            {error && <div className="mt-1 text-xs text-red-500">{error}</div>}
+            {error && (
+                <div className="mt-1 text-xs text-red-500">
+                    {typeof error === 'object' ? JSON.stringify(error) : error}
+                </div>
+            )}
         </div>
     );
 }

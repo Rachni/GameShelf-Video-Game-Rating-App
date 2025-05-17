@@ -19,100 +19,122 @@ import {
 
 // Componente para manejar descripciones inteligentes
 const SmartDescription = ({ text, maxCollapsedChars = 300 }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({});
+    const [expanded, setExpanded] = useState(false);
+    const [expandedSections, setExpandedSections] = useState({});
 
-  if (!text) return null;
+    if (!text) return null;
 
-  // Función mejorada para detectar secciones
-  const detectSections = (content) => {
-    // Detecta patrones comunes de títulos (palabras en mayúsculas, signos de exclamación, guiones)
-    const sectionRegex = /(\n[A-Z][A-Z\s]+[!:-]|\n-{3,})/g;
-    const sections = content.split(sectionRegex).filter(part => part.trim().length > 0);
-    
-    // Si no encuentra secciones claras, intenta dividir por párrafos largos
-    if (sections.length <= 1) {
-      return content.split(/(\n{2,})/g).filter(part => part.trim().length > 0);
-    }
-    return sections;
-  };
+    // Función mejorada para detectar secciones
+    const detectSections = (content) => {
+        const sectionRegex = /(\n[A-Z][A-Z\s]+[!:-]|\n-{3,})/g;
+        const sections = content
+            .split(sectionRegex)
+            .filter((part) => part.trim().length > 0);
 
-  // Procesa el texto para limpiar caracteres HTML
-  const cleanText = text.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-
-  const parts = detectSections(cleanText);
-  
-  // Si no hay secciones claras
-  if (parts.length <= 1) {
-    const shouldTruncate = cleanText.length > maxCollapsedChars && !expanded;
-    const displayText = shouldTruncate 
-      ? `${cleanText.substring(0, maxCollapsedChars)}...` 
-      : cleanText;
-
-    return (
-      <div className="prose prose-sm max-w-none dark:prose-invert">
-        {displayText.split('\n\n').map((paragraph, i) => (
-          <p key={i} className="mb-4 last:mb-0">
-            {paragraph}
-          </p>
-        ))}
-        {cleanText.length > maxCollapsedChars && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-cyan-500 hover:text-cyan-400 font-medium mt-2"
-          >
-            {expanded ? 'Show less' : 'Read more'}
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // Procesar secciones detectadas
-  return (
-    <div className="space-y-6">
-      {parts.map((part, index) => {
-        // Verificar si es un título (termina con !, : o ---)
-        const isTitle = /[A-Z\s]+[!:-]|^-{3,}$/.test(part.trim());
-        
-        if (isTitle) {
-          const sectionTitle = part.trim().replace(/[:!-]+$/, '').trim();
-          const sectionContent = index + 1 < parts.length ? parts[index + 1] : '';
-          const isExpanded = expandedSections[sectionTitle] !== false;
-          const shouldTruncate = sectionContent.length > maxCollapsedChars;
-
-          return (
-            <div key={index} className="border-l-4 border-cyan-500 pl-4">
-              <h3 className="font-bold text-lg text-cyan-500 mb-3">
-                {sectionTitle}
-              </h3>
-              <div className="prose prose-sm max-w-none dark:prose-invert">
-                {sectionContent.split('\n\n').map((paragraph, i) => (
-                  <p key={i} className="mb-3 last:mb-0">
-                    {shouldTruncate && !isExpanded && i === 0
-                      ? `${paragraph.substring(0, maxCollapsedChars)}...`
-                      : paragraph}
-                  </p>
-                ))}
-                {shouldTruncate && (
-                  <button
-                    onClick={() => setExpandedSections(prev => ({
-                      ...prev,
-                      [sectionTitle]: !isExpanded
-                    }))}
-                    className="text-cyan-500 hover:text-cyan-400 font-medium mt-2"
-                  >
-                    {isExpanded ? 'Show less' : 'Read more'}
-                  </button>
-                )}
-              </div>
-            </div>
-          );
+        if (sections.length <= 1) {
+            return content
+                .split(/(\n{2,})/g)
+                .filter((part) => part.trim().length > 0);
         }
-        return null;
-      })}
-    </div>
-  );
+        return sections;
+    };
+
+    // Procesa el texto para limpiar caracteres HTML
+    const cleanText = text
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+
+    const parts = detectSections(cleanText);
+
+    // Si no hay secciones claras
+    if (parts.length <= 1) {
+        const shouldTruncate =
+            cleanText.length > maxCollapsedChars && !expanded;
+        const displayText = shouldTruncate
+            ? `${cleanText.substring(0, maxCollapsedChars)}...`
+            : cleanText;
+
+        return (
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-p:text-textLight dark:prose-p:text-textDark">
+                {displayText.split("\n\n").map((paragraph, i) => (
+                    <p key={i} className="mb-4 last:mb-0">
+                        {paragraph}
+                    </p>
+                ))}
+                {cleanText.length > maxCollapsedChars && (
+                    <button
+                        onClick={() => setExpanded(!expanded)}
+                        className="text-accent hover:text-accent.dark font-medium mt-2"
+                    >
+                        {expanded ? "Show less" : "Read more"}
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    // Procesar secciones detectadas
+    return (
+        <div className="space-y-6">
+            {parts.map((part, index) => {
+                const isTitle = /[A-Z\s]+[!:-]|^-{3,}$/.test(part.trim());
+
+                if (isTitle) {
+                    const sectionTitle = part
+                        .trim()
+                        .replace(/[:!-]+$/, "")
+                        .trim();
+                    const sectionContent =
+                        index + 1 < parts.length ? parts[index + 1] : "";
+                    const isExpanded = expandedSections[sectionTitle] !== false;
+                    const shouldTruncate =
+                        sectionContent.length > maxCollapsedChars;
+
+                    return (
+                        <div
+                            key={index}
+                            className="border-l-4 border-accent pl-4"
+                        >
+                            <h3 className="font-bold text-lg text-accent mb-3">
+                                {sectionTitle}
+                            </h3>
+                            <div className="prose prose-sm max-w-none dark:prose-invert prose-p:text-textLight dark:prose-p:text-textDark">
+                                {sectionContent
+                                    .split("\n\n")
+                                    .map((paragraph, i) => (
+                                        <p key={i} className="mb-3 last:mb-0">
+                                            {shouldTruncate &&
+                                            !isExpanded &&
+                                            i === 0
+                                                ? `${paragraph.substring(
+                                                      0,
+                                                      maxCollapsedChars
+                                                  )}...`
+                                                : paragraph}
+                                        </p>
+                                    ))}
+                                {shouldTruncate && (
+                                    <button
+                                        onClick={() =>
+                                            setExpandedSections((prev) => ({
+                                                ...prev,
+                                                [sectionTitle]: !isExpanded,
+                                            }))
+                                        }
+                                        className="text-accent hover:text-accent.dark font-medium mt-2"
+                                    >
+                                        {isExpanded ? "Show less" : "Read more"}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                }
+                return null;
+            })}
+        </div>
+    );
 };
 
 export function GameDetails() {
@@ -237,7 +259,7 @@ export function GameDetails() {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-12 w-12 rounded-full bg-cyan-500 mb-4"></div>
+                    <div className="h-12 w-12 rounded-full bg-accent mb-4"></div>
                     <div className="h-4 w-32 rounded"></div>
                 </div>
             </div>
@@ -247,11 +269,13 @@ export function GameDetails() {
     if (error) {
         return (
             <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4 text-cyan-400">Error</h2>
-                <p className="mb-6 text-gray-400">{error}</p>
+                <h2 className="text-2xl font-bold mb-4 text-accent">Error</h2>
+                <p className="mb-6 text-textLight dark:text-textDark">
+                    {error}
+                </p>
                 <Link
                     to="/"
-                    className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
+                    className="px-6 py-3 bg-accent hover:bg-accent.dark text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
                 >
                     Back to Home
                 </Link>
@@ -262,16 +286,16 @@ export function GameDetails() {
     if (!game) {
         return (
             <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4 text-cyan-400">
+                <h2 className="text-2xl font-bold mb-4 text-accent">
                     Game not found
                 </h2>
-                <p className="mb-6 text-gray-400">
+                <p className="mb-6 text-textLight dark:text-textDark">
                     The game you're looking for doesn't exist or has been
                     removed.
                 </p>
                 <Link
                     to="/"
-                    className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
+                    className="px-6 py-3 bg-accent hover:bg-accent.dark text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
                 >
                     Back to Home
                 </Link>
@@ -281,9 +305,7 @@ export function GameDetails() {
 
     return (
         <div
-            className={`min-h-screen ${
-                theme === "dark" ? "bg-gray-900" : "bg-gray-100"
-            } ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+            className={`min-h-screen bg-lightBg dark:bg-darkBg text-textLight dark:text-textDark`}
         >
             {/* Game Header with gradient overlay */}
             <div className="relative">
@@ -298,11 +320,7 @@ export function GameDetails() {
                             }}
                         ></div>
                         <div
-                            className={`absolute inset-0 bg-gradient-to-t ${
-                                theme === "dark"
-                                    ? "from-gray-900 via-gray-900/70"
-                                    : "from-gray-100 via-gray-100/70"
-                            } to-transparent`}
+                            className={`absolute inset-0 bg-gradient-to-t from-lightBg via-lightBg/70 dark:from-darkBg dark:via-darkBg/70 to-transparent`}
                         ></div>
                     </div>
                 )}
@@ -321,30 +339,20 @@ export function GameDetails() {
                                     className="w-full h-auto object-cover aspect-[3/4]"
                                 />
                                 <div
-                                    className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent ${
-                                        theme === "dark"
-                                            ? "to-black/50"
-                                            : "to-white/50"
-                                    } opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}
+                                    className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 dark:to-white/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}
                                 >
-                                    <span
-                                        className={`${
-                                            theme === "dark"
-                                                ? "text-white"
-                                                : "text-gray-900"
-                                        } font-medium`}
-                                    >
+                                    <span className="text-white dark:text-darkBg font-medium">
                                         Click to enlarge
                                     </span>
                                 </div>
-                                <div className="absolute inset-0 border-2 border-transparent group-hover:border-cyan-400/30 transition-all duration-300 rounded-xl pointer-events-none"></div>
+                                <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/30 transition-all duration-300 rounded-xl pointer-events-none"></div>
                             </div>
                         </div>
 
                         {/* Game Details */}
                         <div className="md:w-2/3 lg:w-3/4">
                             <div className="mb-6">
-                                <h1 className="text-4xl md:text-5xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
+                                <h1 className="text-4xl md:text-5xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent.light">
                                     {game.name}
                                 </h1>
 
@@ -352,15 +360,11 @@ export function GameDetails() {
                                 <div className="flex flex-wrap items-center gap-4 mb-6">
                                     {game.released && (
                                         <div
-                                            className={`flex items-center ${
-                                                theme === "dark"
-                                                    ? "bg-gray-800/80"
-                                                    : "bg-gray-200/80"
-                                            } px-3 py-1 rounded-full`}
+                                            className={`flex items-center bg-gray-200/80 dark:bg-darkBg/80 px-3 py-1 rounded-full`}
                                         >
                                             <Calendar
                                                 size={16}
-                                                className="mr-2 text-cyan-400"
+                                                className="mr-2 text-accent"
                                             />
                                             <span className="text-sm font-medium">
                                                 {new Date(
@@ -394,16 +398,12 @@ export function GameDetails() {
                                     <div className="flex items-center flex-wrap gap-2 mb-6">
                                         <Tag
                                             size={18}
-                                            className="text-cyan-400"
+                                            className="text-accent"
                                         />
                                         {game.genres.map((genre) => (
                                             <span
                                                 key={genre.id}
-                                                className={`px-3 py-1 ${
-                                                    theme === "dark"
-                                                        ? "bg-gray-800/70"
-                                                        : "bg-gray-200/70"
-                                                } rounded-full text-sm font-medium hover:bg-cyan-500/20 transition-colors duration-200`}
+                                                className={`px-3 py-1 bg-gray-200/70 dark:bg-darkBg/70 rounded-full text-sm font-medium hover:bg-accent/20 transition-colors duration-200`}
                                             >
                                                 {genre.name}
                                             </span>
@@ -416,20 +416,12 @@ export function GameDetails() {
                                     <div className="flex items-center flex-wrap gap-3 mb-8">
                                         <Monitor
                                             size={18}
-                                            className="text-cyan-400"
+                                            className="text-accent"
                                         />
                                         {game.platforms.map((platform) => (
                                             <span
                                                 key={platform.id}
-                                                className={`text-sm ${
-                                                    theme === "dark"
-                                                        ? "bg-gray-800/50"
-                                                        : "bg-gray-200/50"
-                                                } px-3 py-1 rounded-full border ${
-                                                    theme === "dark"
-                                                        ? "border-gray-700"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className={`text-sm bg-gray-200/50 dark:bg-darkBg/50 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-700`}
                                             >
                                                 {platform.name}
                                             </span>
@@ -442,17 +434,9 @@ export function GameDetails() {
                             <div className="flex flex-wrap gap-4 mb-8">
                                 {/* User Rating */}
                                 <div
-                                    className={`${
-                                        theme === "dark"
-                                            ? "bg-gray-800/70"
-                                            : "bg-gray-200/70"
-                                    } p-4 rounded-xl border ${
-                                        theme === "dark"
-                                            ? "border-gray-700/50"
-                                            : "border-gray-300/50"
-                                    } flex-1 min-w-[250px]`}
+                                    className={`bg-gray-200/70 dark:bg-darkBg/70 p-4 rounded-xl border border-gray-300/50 dark:border-gray-700/50 flex-1 min-w-[250px]`}
                                 >
-                                    <h3 className="text-lg font-semibold mb-3 text-cyan-400">
+                                    <h3 className="text-lg font-semibold mb-3 text-accent">
                                         Your Rating
                                     </h3>
                                     <RatingStars
@@ -466,27 +450,15 @@ export function GameDetails() {
                                 {/* Add to List */}
                                 {user && (
                                     <div
-                                        className={`${
-                                            theme === "dark"
-                                                ? "bg-gray-800/70"
-                                                : "bg-gray-200/70"
-                                        } p-4 rounded-xl border ${
-                                            theme === "dark"
-                                                ? "border-gray-700/50"
-                                                : "border-gray-300/50"
-                                        } flex-1 min-w-[250px] relative`}
+                                        className={`bg-gray-200/70 dark:bg-darkBg/70 p-4 rounded-xl border border-gray-300/50 dark:border-gray-700/50 flex-1 min-w-[250px] relative`}
                                     >
-                                        <h3 className="text-lg font-semibold mb-3 text-cyan-400">
+                                        <h3 className="text-lg font-semibold mb-3 text-accent">
                                             Collections
                                         </h3>
 
                                         {successMessage && (
                                             <div
-                                                className={`mb-3 p-2 bg-green-600/20 border ${
-                                                    theme === "dark"
-                                                        ? "border-green-600/30"
-                                                        : "border-green-600/20"
-                                                } rounded-lg text-green-400 text-sm`}
+                                                className={`mb-3 p-2 bg-green-600/20 border border-green-600/20 dark:border-green-600/30 rounded-lg text-green-400 text-sm`}
                                             >
                                                 {successMessage}
                                             </div>
@@ -498,7 +470,7 @@ export function GameDetails() {
                                                     !isAddToListOpen
                                                 )
                                             }
-                                            className="flex items-center justify-center w-full px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-all duration-300"
+                                            className="flex items-center justify-center w-full px-4 py-2 bg-accent hover:bg-accent.dark text-white font-medium rounded-lg transition-all duration-300"
                                         >
                                             <Plus size={18} className="mr-2" />
                                             Add to List
@@ -510,15 +482,7 @@ export function GameDetails() {
 
                                         {isAddToListOpen && (
                                             <div
-                                                className={`absolute z-10 mt-2 w-full rounded-xl shadow-2xl ${
-                                                    theme === "dark"
-                                                        ? "bg-gray-800"
-                                                        : "bg-gray-200"
-                                                } border ${
-                                                    theme === "dark"
-                                                        ? "border-gray-700"
-                                                        : "border-gray-300"
-                                                } overflow-hidden`}
+                                                className={`absolute z-10 mt-2 w-full rounded-xl shadow-2xl bg-gray-200 dark:bg-darkBg border border-gray-300 dark:border-gray-700 overflow-hidden`}
                                             >
                                                 <div className="py-1">
                                                     {userLists.length > 0 ? (
@@ -533,17 +497,7 @@ export function GameDetails() {
                                                                             list.id
                                                                         )
                                                                     }
-                                                                    className={`flex justify-between items-center w-full text-left px-4 py-3 hover:${
-                                                                        theme ===
-                                                                        "dark"
-                                                                            ? "bg-gray-700/50"
-                                                                            : "bg-gray-300/50"
-                                                                    } transition-colors duration-200 border-b ${
-                                                                        theme ===
-                                                                        "dark"
-                                                                            ? "border-gray-700/50"
-                                                                            : "border-gray-300/50"
-                                                                    } last:border-0`}
+                                                                    className={`flex justify-between items-center w-full text-left px-4 py-3 hover:bg-gray-300/50 dark:hover:bg-gray-700/50 transition-colors duration-200 border-b border-gray-300/50 dark:border-gray-700/50 last:border-0`}
                                                                 >
                                                                     <span>
                                                                         {
@@ -555,15 +509,7 @@ export function GameDetails() {
                                                         )
                                                     ) : (
                                                         <p
-                                                            className={`px-4 py-3 text-sm ${
-                                                                theme === "dark"
-                                                                    ? "text-gray-400"
-                                                                    : "text-gray-600"
-                                                            } border-b ${
-                                                                theme === "dark"
-                                                                    ? "border-gray-700/50"
-                                                                    : "border-gray-300/50"
-                                                            }`}
+                                                            className={`px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-300/50 dark:border-gray-700/50`}
                                                         >
                                                             You don't have any
                                                             lists yet
@@ -571,11 +517,7 @@ export function GameDetails() {
                                                     )}
                                                     <Link
                                                         to={`/users/${user.name}`}
-                                                        className={`block w-full text-left px-4 py-3 text-cyan-400 hover:${
-                                                            theme === "dark"
-                                                                ? "bg-gray-700/50"
-                                                                : "bg-gray-300/50"
-                                                        } transition-colors duration-200 font-medium`}
+                                                        className={`block w-full text-left px-4 py-3 text-accent hover:bg-gray-300/50 dark:hover:bg-gray-700/50 transition-colors duration-200 font-medium`}
                                                     >
                                                         Manage Lists
                                                     </Link>
@@ -589,7 +531,7 @@ export function GameDetails() {
                             {/* Description */}
                             {game.description && (
                                 <div className="mb-8">
-                                    <h3 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-700 text-cyan-400">
+                                    <h3 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-700 text-accent">
                                         About
                                     </h3>
                                     <SmartDescription
@@ -605,15 +547,7 @@ export function GameDetails() {
                                     href={game.website}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`inline-flex items-center px-4 py-2 ${
-                                        theme === "dark"
-                                            ? "bg-gray-800 hover:bg-gray-700"
-                                            : "bg-gray-200 hover:bg-gray-300"
-                                    } rounded-lg border ${
-                                        theme === "dark"
-                                            ? "border-gray-700"
-                                            : "border-gray-300"
-                                    } text-cyan-400 hover:text-cyan-300 transition-all duration-300`}
+                                    className={`inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-darkBg hover:dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-700 text-accent hover:text-accent.light transition-all duration-300`}
                                 >
                                     Visit Official Website
                                     <ExternalLink size={16} className="ml-2" />
@@ -633,23 +567,11 @@ export function GameDetails() {
                     <div className="relative max-w-5xl w-full p-4">
                         <button
                             onClick={() => setIsModalOpen(false)}
-                            className={`absolute top-6 right-6 p-2 ${
-                                theme === "dark"
-                                    ? "bg-gray-800 hover:bg-gray-700"
-                                    : "bg-gray-200 hover:bg-gray-300"
-                            } rounded-full border ${
-                                theme === "dark"
-                                    ? "border-gray-700"
-                                    : "border-gray-300"
-                            } transition-all duration-300 hover:rotate-90`}
+                            className={`absolute top-6 right-6 p-2 bg-gray-200 hover:bg-gray-300 dark:bg-darkBg hover:dark:bg-gray-700 rounded-full border border-gray-300 dark:border-gray-700 transition-all duration-300 hover:rotate-90`}
                         >
                             <X
                                 size={24}
-                                className={
-                                    theme === "dark"
-                                        ? "text-white"
-                                        : "text-gray-900"
-                                }
+                                className="text-textLight dark:text-textDark"
                             />
                         </button>
                         <img
@@ -664,21 +586,13 @@ export function GameDetails() {
             {/* Reviews Section */}
             <section className="container mx-auto px-4 py-12">
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold mb-8 pb-4 border-b border-gray-700 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
+                    <h2 className="text-3xl font-bold mb-8 pb-4 border-b border-gray-700 text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent.light">
                         Community Reviews
                     </h2>
 
                     {user && (
                         <div
-                            className={`mb-10 ${
-                                theme === "dark"
-                                    ? "bg-gray-800/50"
-                                    : "bg-gray-200/50"
-                            } p-6 rounded-xl border ${
-                                theme === "dark"
-                                    ? "border-gray-700/50"
-                                    : "border-gray-300/50"
-                            } shadow-lg`}
+                            className={`mb-10 bg-gray-200/50 dark:bg-darkBg/50 p-6 rounded-xl border border-gray-300/50 dark:border-gray-700/50 shadow-lg`}
                         >
                             <ReviewForm
                                 gameId={game.id}
@@ -696,40 +610,18 @@ export function GameDetails() {
                                     showUser={true}
                                     showGame={false}
                                     showGameImage={false}
-                                    className={`${
-                                        theme === "dark"
-                                            ? "bg-gray-800/50 hover:bg-gray-800/70"
-                                            : "bg-gray-200/50 hover:bg-gray-200/70"
-                                    } transition-colors duration-300 border ${
-                                        theme === "dark"
-                                            ? "border-gray-700/50"
-                                            : "border-gray-300/50"
-                                    } rounded-xl overflow-hidden shadow-lg`}
+                                    className={`bg-gray-200/50 hover:bg-gray-200/70 dark:bg-darkBg/50 hover:dark:bg-darkBg/70 transition-colors duration-300 border border-gray-300/50 dark:border-gray-700/50 rounded-xl overflow-hidden shadow-lg`}
                                 />
                             ))}
                         </div>
                     ) : (
                         <div
-                            className={`${
-                                theme === "dark"
-                                    ? "bg-gray-800/50"
-                                    : "bg-gray-200/50"
-                            } p-8 rounded-xl border ${
-                                theme === "dark"
-                                    ? "border-gray-700/50"
-                                    : "border-gray-300/50"
-                            } text-center`}
+                            className={`bg-gray-200/50 dark:bg-darkBg/50 p-8 rounded-xl border border-gray-300/50 dark:border-gray-700/50 text-center`}
                         >
-                            <h3 className="text-xl font-medium mb-2 text-cyan-400">
+                            <h3 className="text-xl font-medium mb-2 text-accent">
                                 No reviews yet
                             </h3>
-                            <p
-                                className={
-                                    theme === "dark"
-                                        ? "text-gray-400"
-                                        : "text-gray-600"
-                                }
-                            >
+                            <p className="text-textLight dark:text-textDark">
                                 Be the first to share your thoughts about{" "}
                                 {game.name}!
                             </p>

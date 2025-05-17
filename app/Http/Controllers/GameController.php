@@ -94,8 +94,8 @@ class GameController extends Controller
                 'query' => [
                     'key' => $apiKey,
                     'search' => $searchQuery,
-                    'search_precise' => true, // Buscar coincidencias precisas
-                    'page_size' => 5, // Limitar el número de resultados
+                    'search_precise' => true, 
+                    'page_size' => 5,
                     'ordering' => '-metacritic', // Ordenar por puntuación de Metacritic
                 ],
             ]);
@@ -133,7 +133,7 @@ class GameController extends Controller
                     // Verificar si el slug ya existe en la base de datos
                     $existingSlug = VideoGame::where('slug', $slug)->exists();
                     if ($existingSlug) {
-                        // Si el slug ya existe, agregar un sufijo único (por ejemplo, el ID de RAWG)
+                        // Si el slug ya existe, agregar un sufijo único por ejemplo, el id de RAWG
                         $slug = $slug . '-' . $gameData['id'];
                     }
 

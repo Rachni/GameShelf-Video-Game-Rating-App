@@ -32,7 +32,8 @@ export function GameListDetail() {
                     `/api/users/${username}/lists/${listId}`,
                     {
                         headers: {
-                            Authorization: user && token ? `Bearer ${token}` : "",
+                            Authorization:
+                                user && token ? `Bearer ${token}` : "",
                             "Content-Type": "application/json",
                             Accept: "application/json",
                             "X-Requested-With": "XMLHttpRequest",
@@ -106,7 +107,11 @@ export function GameListDetail() {
     };
 
     const deleteList = async () => {
-        if (!confirm("Are you sure you want to delete this list? This action cannot be undone.")) {
+        if (
+            !confirm(
+                "Are you sure you want to delete this list? This action cannot be undone."
+            )
+        ) {
             return;
         }
 
@@ -213,7 +218,11 @@ export function GameListDetail() {
     const isOwnList = user && list.user_id === user.id;
 
     return (
-        <div className={`container mx-auto px-4 py-8 ${theme === "dark" ? "dark" : ""}`}>
+        <div
+            className={`container mx-auto px-4 py-8 ${
+                theme === "dark" ? "dark" : ""
+            }`}
+        >
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center mb-2">
@@ -230,9 +239,13 @@ export function GameListDetail() {
                                 value={listName}
                                 onChange={(e) => setListName(e.target.value)}
                                 className={`flex-1 px-4 py-2 text-2xl font-bold rounded-lg mr-2 ${
-                                    theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-100"
+                                    theme === "dark"
+                                        ? "bg-gray-700 text-white"
+                                        : "bg-gray-100"
                                 } border ${
-                                    theme === "dark" ? "border-gray-600" : "border-gray-300"
+                                    theme === "dark"
+                                        ? "border-gray-600"
+                                        : "border-gray-300"
                                 }`}
                                 autoFocus
                             />
@@ -248,7 +261,9 @@ export function GameListDetail() {
                                     setListName(list.name);
                                 }}
                                 className={`px-4 py-2 rounded ${
-                                    theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+                                    theme === "dark"
+                                        ? "bg-gray-700 hover:bg-gray-600"
+                                        : "bg-gray-200 hover:bg-gray-300"
                                 } transition-colors`}
                             >
                                 Cancel
@@ -285,7 +300,8 @@ export function GameListDetail() {
                     )}
                 </div>
                 <p className="text-gray-600 dark:text-gray-300">
-                    {games.length} {games.length === 1 ? "game" : "games"} in this list
+                    {games.length} {games.length === 1 ? "game" : "games"} in
+                    this list
                 </p>
             </div>
 
@@ -304,7 +320,7 @@ export function GameListDetail() {
                 {games.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         {games.map((game) => (
-                            <div key={game.id} className="relative">
+                            <div key={game.id} className="relative group">
                                 <GameCardSimple
                                     game={{
                                         ...game,
@@ -313,7 +329,9 @@ export function GameListDetail() {
                                         stores: game.stores || [],
                                     }}
                                     onRemove={
-                                        isOwnList ? removeGameFromList : null
+                                        isOwnList && !list.is_favorite
+                                            ? () => removeGameFromList(game.id)
+                                            : null
                                     }
                                     className="transition-transform hover:scale-105 hover:shadow-xl"
                                 />

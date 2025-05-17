@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/games/rate', [ReviewController::class, 'rateGame']);
 });
+
 Route::middleware('auth:sanctum')->get('/auth/check', function () {
     return response()->json(['authenticated' => true]);
 });

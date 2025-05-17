@@ -32,25 +32,28 @@ class ReviewController extends Controller
                 ->first();
 
             if ($existingReview) {
-                // Actualizar reseña existente
-                $existingReview->star_rating = $request->rating;
-                $existingReview->text = $request->content;
-                $existingReview->save();
+                // Actualizar reseña existente usando update() para que actualice el timestamp
+                $existingReview->update([
+                    'star_rating' => $request->rating,
+                    'text' => $request->content
+                ]);
 
                 return response()->json($this->formatReview($existingReview));
             }
 
-            // Crear nueva reseña
-            $review = new Review();
-            $review->user_id = Auth::id();
-            $review->game_id = $request->game_id;
-            $review->star_rating = $request->rating;
-            $review->text = $request->content;
-            $review->save();
+            // Crear nueva reseña usando create() para que establezca los timestamps
+            $review = Review::create([
+                'user_id' => Auth::id(),
+                'game_id' => $request->game_id,
+                'star_rating' => $request->rating,
+                'text' => $request->content,
+                'created_at' => now(),
+                'updated_at' => now()
+
+            ]);
 
             return response()->json($this->formatReview($review));
         } catch (\Throwable $e) {
-            // Devolver error detallado para depuración
             Log::error('Error en store: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -211,9 +214,11 @@ class ReviewController extends Controller
 
     public function getRecentReviews()
     {
-        // Obtener las últimas 10 reseñas ordenadas por fecha de creación
+        // Obtener las últimas 10 reseñas con texto no vacío, ordenadas por id PROXIMAMENTE FECHA
         $reviews = Review::with(['user:id,name,profile_pic', 'game:id,name,slug,image_url'])
-            ->orderBy('created_at', 'desc')
+            ->whereNotNull('text') 
+            ->where('text', '<>', '')
+            ->orderBy('id', 'desc')
             ->limit(10)
             ->get();
 

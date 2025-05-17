@@ -122,18 +122,10 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'password' => 'required|string',
-            'confirmation' => 'required|string|in:DELETE'
+            'confirmation' => 'required|string|in:DELETE' // Solo requerimos confirmación
         ]);
 
         $user = $request->user();
-
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password is incorrect'
-            ], 401);
-        }
 
         try {
             DB::transaction(function () use ($user) {

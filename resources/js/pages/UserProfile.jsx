@@ -50,17 +50,14 @@ export function UserProfile() {
             setError(null);
 
             try {
-                // Buscar usuario por username
                 const userResponse = await api.get(`/users/${username}`);
-
-                // Verifica la respuesta correctamente
                 if (
                     !userResponse.data ||
                     userResponse.data.message === "User not found"
                 ) {
                     throw new Error("User not found.");
                 }
- 
+
                 const userData = {
                     id: userResponse.data.id,
                     name: userResponse.data.name,
@@ -84,7 +81,6 @@ export function UserProfile() {
                                     Authorization: `Bearer ${token}`,
                                     "Content-Type": "application/json",
                                     Accept: "application/json",
-                                    "X-Requested-With": "XMLHttpRequest",
                                 },
                                 withCredentials: true,
                             })
@@ -103,7 +99,7 @@ export function UserProfile() {
                     ...review,
                     game: {
                         id: review.game?.id || null,
-                        name: review.game?.name || "Unknown Game.",
+                        name: review.game?.name || "Unknown Game",
                         image_url: review.game?.image_url || "",
                     },
                     text: review.text || "",
@@ -114,7 +110,6 @@ export function UserProfile() {
 
                 setUserLists(lists.data);
                 setGenreStats(stats.data);
-                // Y luego añadir esta línea después de setGenreStats(stats.data);
                 setListGenreStats(listGenreStats.data);
             } catch (error) {
                 console.error("Failed to load user profile:", error);
@@ -130,7 +125,7 @@ export function UserProfile() {
         };
 
         fetchUserProfile();
-    }, [username, currentUser, navigate]);
+    }, [username, currentUser, navigate, token]);
 
     const createList = async () => {
         if (!newListName.trim()) {
@@ -141,7 +136,6 @@ export function UserProfile() {
         try {
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 2. Hacer la petición para crear la lista
             const response = await api.post(
                 "/lists",
                 { name: newListName },
@@ -150,7 +144,6 @@ export function UserProfile() {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                         Accept: "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
                     },
                     withCredentials: true,
                 }
@@ -166,9 +159,8 @@ export function UserProfile() {
             setError(
                 error.response?.data?.message ||
                     error.message ||
-                    "Failed to create list. Please try again."
+                    "Failed to create list."
             );
-
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
             }
@@ -182,11 +174,9 @@ export function UserProfile() {
         }
 
         try {
-            // 1. Obtener token CSRF si no existe
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 2. Hacer la petición para actualizar la lista
-            const response = await api.put(
+            await api.put(
                 `/lists/${listId}`,
                 { name: editingListName },
                 {
@@ -194,7 +184,6 @@ export function UserProfile() {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                         Accept: "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
                     },
                     withCredentials: true,
                 }
@@ -214,9 +203,8 @@ export function UserProfile() {
             setError(
                 error.response?.data?.message ||
                     error.message ||
-                    "Failed to update list. Please try again."
+                    "Failed to update list."
             );
-
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
             }
@@ -224,21 +212,16 @@ export function UserProfile() {
     };
 
     const deleteList = async (listId) => {
-        if (!confirm("Are you sure you want to delete this list?")) {
-            return;
-        }
+        if (!confirm("Are you sure you want to delete this list?")) return;
 
         try {
-            // 1. Obtener token CSRF si no existe
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 2. Hacer la petición para eliminar la lista
             await api.delete(`/lists/${listId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
                     Accept: "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
                 },
                 withCredentials: true,
             });
@@ -251,9 +234,8 @@ export function UserProfile() {
             setError(
                 error.response?.data?.message ||
                     error.message ||
-                    "Failed to delete list. Please try again."
+                    "Failed to delete list."
             );
-
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
             }
@@ -293,12 +275,14 @@ export function UserProfile() {
     if (error) {
         return (
             <div className="container mx-auto px-4 py-12 text-center">
-                <h2 className="text-2xl font-bold mb-4">Error</h2>
+                <h2 className="text-2xl font-bold text-heading dark:text-textDark mb-4">
+                    Error
+                </h2>
                 <p className="mb-6 text-red-500 dark:text-red-400">{error}</p>
                 {!currentUser && (
                     <Link
                         to="/login"
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        className="px-4 py-2 bg-interactive text-white rounded hover:bg-interactiveHover transition-colors"
                     >
                         Log In
                     </Link>
@@ -316,13 +300,15 @@ export function UserProfile() {
     if (!user) {
         return (
             <div className="container mx-auto px-4 py-12 text-center">
-                <h2 className="text-2xl font-bold mb-4">User not found</h2>
-                <p className="mb-6">
+                <h2 className="text-2xl font-bold text-heading dark:text-textDark mb-4">
+                    User not found
+                </h2>
+                <p className="mb-6 text-textLight dark:text-textDark">
                     User @{username} doesn't exist or is private.
                 </p>
                 <Link
                     to="/"
-                    className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                    className="px-4 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors"
                 >
                     Return to Home
                 </Link>
@@ -331,66 +317,62 @@ export function UserProfile() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {/* Header del Perfil */}
-            <div
-                className={`rounded-lg p-6 mb-8 ${
-                    theme === "dark"
-                        ? "bg-gray-800"
-                        : "bg-white border border-gray-200"
-                } shadow-lg`}
-            >
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+            {/* Profile Header */}
+            <div className="rounded-lg p-6 mb-8 bg-white dark:bg-header shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    <div className="relative w-32 h-32 shrink-0">
+                    <div className="relative w-24 h-24 shrink-0">
                         <img
                             src={user.profile_pic || "/default-avatar.png"}
-                            alt={`Avatar ${user.name}`}
-                            className="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
+                            alt={`${user.name}'s avatar`}
+                            className="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-md"
                             onError={(e) => {
                                 e.target.src = "/default-avatar.png";
                             }}
                         />
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
-                        <p className="text-gray-500 dark:text-gray-400 mb-4">
+                        <h1 className="text-2xl font-bold text-heading dark:text-textDark mb-2">
+                            {user.name}
+                        </h1>
+                        <p className="text-gray-500 dark:text-gray-400 mb-3">
                             @{username}
                         </p>
                         {user.bio && (
-                            <p className="mb-4 text-gray-700 dark:text-gray-300">
+                            <p className="mb-4 text-textLight dark:text-textDark">
                                 {user.bio}
                             </p>
                         )}
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
                             <div>
-                                <span className="font-bold">
+                                <span className="font-bold text-heading dark:text-textDark">
                                     {favoriteGames.length}
                                 </span>
                                 <span className="text-gray-500 dark:text-gray-400 ml-1">
-                                    Juegos favoritos
+                                    Favorite Games
                                 </span>
                             </div>
                             <div>
-                                <span className="font-bold">
+                                <span className="font-bold text-heading dark:text-textDark">
                                     {recentReviews.length}
                                 </span>
                                 <span className="text-gray-500 dark:text-gray-400 ml-1">
-                                    Reseñas
+                                    Reviews
                                 </span>
                             </div>
                             <div>
-                                <span className="font-bold">
+                                <span className="font-bold text-heading dark:text-textDark">
                                     {userLists.length}
                                 </span>
                                 <span className="text-gray-500 dark:text-gray-400 ml-1">
-                                    Listas
+                                    Lists
                                 </span>
                             </div>
                         </div>
                         {isOwnProfile && (
                             <Link
                                 to="/settings"
-                                className="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                                className="inline-flex items-center px-4 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm"
                             >
                                 <Settings size={16} className="mr-2" />
                                 Edit Profile
@@ -400,22 +382,20 @@ export function UserProfile() {
                 </div>
             </div>
 
-            {/* Juegos Favoritos */}
-            <section className="mb-12">
-                <h2 className="text-2xl font-bold mb-6">Favorite games</h2>
+            {/* Favorite Games */}
+            <section className="mb-10">
+                <h2 className="text-xl font-bold text-heading dark:text-textDark mb-4">
+                    Favorite Games
+                </h2>
                 {favoriteGames.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                         {favoriteGames.slice(0, 5).map((game) => (
                             <GameCardSimple key={game.id} game={game} />
                         ))}
                     </div>
                 ) : (
-                    <div
-                        className={`p-6 rounded-lg ${
-                            theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-                        }`}
-                    >
-                        <p className="text-center">
+                    <div className="p-6 rounded-lg bg-gray-100 dark:bg-gray-800 text-center">
+                        <p className="text-textLight dark:text-textDark">
                             {isOwnProfile
                                 ? "You haven't added any favorites yet."
                                 : "This user doesn't have favorites yet."}
@@ -424,9 +404,9 @@ export function UserProfile() {
                             <div className="text-center mt-4">
                                 <Link
                                     to="/games"
-                                    className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors inline-block"
+                                    className="px-4 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm inline-block"
                                 >
-                                    Explore games
+                                    Explore Games
                                 </Link>
                             </div>
                         )}
@@ -434,26 +414,54 @@ export function UserProfile() {
                 )}
             </section>
 
-            {/* Estadísticas de Géneros */}
+            {/* Genre Statistics */}
             {genreStats.length > 0 && (
-                <section className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">
-                        genre preferences
+                <section className="mb-10">
+                    <h2 className="text-xl font-bold text-heading dark:text-textDark mb-4">
+                        Genre Preferences
                     </h2>
-                    <div
-                        className={`p-6 rounded-lg ${
-                            theme === "dark"
-                                ? "bg-gray-800"
-                                : "bg-white border border-gray-200"
-                        } shadow-lg`}
-                    >
-                        <div className="h-80">
+                    <div className="p-4 rounded-lg bg-white dark:bg-header shadow-md border border-gray-200 dark:border-gray-700">
+                        <div className="h-64">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={genreStats}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="count" fill="#6366f1" />
+                                    <XAxis
+                                        dataKey="name"
+                                        tick={{
+                                            fill:
+                                                theme === "dark"
+                                                    ? "#e2e8f0"
+                                                    : "#334155",
+                                        }}
+                                    />
+                                    <YAxis
+                                        tick={{
+                                            fill:
+                                                theme === "dark"
+                                                    ? "#e2e8f0"
+                                                    : "#334155",
+                                        }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor:
+                                                theme === "dark"
+                                                    ? "#1f2833"
+                                                    : "#f8fafc",
+                                            borderColor:
+                                                theme === "dark"
+                                                    ? "#2c3e50"
+                                                    : "#cbd5e1",
+                                            color:
+                                                theme === "dark"
+                                                    ? "#e2e8f0"
+                                                    : "#334155",
+                                        }}
+                                    />
+                                    <Bar
+                                        dataKey="count"
+                                        fill="#ff0059"
+                                        radius={[4, 4, 0, 0]}
+                                    />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -461,46 +469,50 @@ export function UserProfile() {
                 </section>
             )}
 
-            {/* Añadir esta sección después de la sección "Estadísticas de Géneros" */}
+            {/* List Genre Statistics */}
             {listGenreStats.length > 0 && (
-                <section className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Genres in Lists</h2>
+                <section className="mb-10">
+                    <h2 className="text-xl font-bold text-heading dark:text-textDark mb-4">
+                        Genres in Lists
+                    </h2>
                     <GenreChart data={listGenreStats} />
                 </section>
             )}
 
-            {/* Pestañas */}
+            {/* Tabs */}
             <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-                <nav className="flex space-x-8">
+                <nav className="flex space-x-4">
                     <button
                         onClick={() => setActiveTab("reviews")}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                        className={`py-3 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "reviews"
-                                ? "border-primary text-primary"
+                                ? "border-heading text-heading dark:text-textDark"
                                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                         }`}
                     >
-                        Reseñas
+                        Reviews
                     </button>
                     <button
                         onClick={() => setActiveTab("lists")}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                        className={`py-3 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "lists"
-                                ? "border-primary text-primary"
+                                ? "border-heading text-heading dark:text-textDark"
                                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                         }`}
                     >
-                        Listas
+                        Lists
                     </button>
                 </nav>
             </div>
 
-            {/* Contenido de Reseñas */}
+            {/* Reviews Content */}
             {activeTab === "reviews" && (
                 <section>
-                    <h2 className="text-2xl font-bold mb-6">Recent reviews</h2>
+                    <h2 className="text-xl font-bold text-heading dark:text-textDark mb-4">
+                        Recent Reviews
+                    </h2>
                     {recentReviews.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {recentReviews.slice(0, 5).map((review) => (
                                 <ReviewCard
                                     key={review.id}
@@ -508,27 +520,24 @@ export function UserProfile() {
                                     showUser={false}
                                     showGame={true}
                                     showGameImage={true}
+                                    className="bg-white dark:bg-header border border-gray-200 dark:border-gray-700"
                                 />
                             ))}
                         </div>
                     ) : (
-                        <div
-                            className={`p-6 rounded-lg ${
-                                theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-                            }`}
-                        >
-                            <p className="text-center">
+                        <div className="p-6 rounded-lg bg-gray-100 dark:bg-gray-800 text-center">
+                            <p className="text-textLight dark:text-textDark">
                                 {isOwnProfile
-                                    ? "Aún no has escrito ninguna reseña."
-                                    : "Este usuario no ha escrito reseñas aún."}
+                                    ? "You haven't written any reviews yet."
+                                    : "This user hasn't written reviews yet."}
                             </p>
                             {isOwnProfile && (
                                 <div className="text-center mt-4">
                                     <Link
                                         to="/games"
-                                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors inline-block"
+                                        className="px-4 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm inline-block"
                                     >
-                                        Write a review
+                                        Write a Review
                                     </Link>
                                 </div>
                             )}
@@ -537,29 +546,17 @@ export function UserProfile() {
                 </section>
             )}
 
-            {/* Contenido de Listas */}
+            {/* Lists Content */}
             {activeTab === "lists" && (
                 <section>
                     {successMessage && (
-                        <div
-                            className={`p-4 mb-4 rounded-lg ${
-                                theme === "dark"
-                                    ? "bg-green-800/50"
-                                    : "bg-green-100"
-                            } text-green-700 dark:text-green-300`}
-                        >
+                        <div className="p-3 mb-4 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                             {successMessage}
                         </div>
                     )}
 
                     {error && (
-                        <div
-                            className={`p-4 mb-4 rounded-lg ${
-                                theme === "dark"
-                                    ? "bg-red-800/50"
-                                    : "bg-red-100"
-                            } text-red-700 dark:text-red-300`}
-                        >
+                        <div className="p-3 mb-4 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
                             {error}
                             <button
                                 className="float-right font-bold"
@@ -570,31 +567,27 @@ export function UserProfile() {
                         </div>
                     )}
 
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold">Game lists</h2>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-heading dark:text-textDark">
+                            Game Lists
+                        </h2>
                         {isOwnProfile && !isCreatingList && (
                             <button
                                 onClick={() => setIsCreatingList(true)}
-                                className="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                                className="inline-flex items-center px-3 py-1.5 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm"
                             >
-                                <Plus size={16} className="mr-2" />
-                                Create list
+                                <Plus size={16} className="mr-1" />
+                                Create List
                             </button>
                         )}
                     </div>
 
                     {isCreatingList && isOwnProfile && (
-                        <div
-                            className={`p-6 rounded-lg mb-6 ${
-                                theme === "dark"
-                                    ? "bg-gray-800"
-                                    : "bg-white border border-gray-200"
-                            } shadow-lg`}
-                        >
-                            <h3 className="text-xl font-semibold mb-4">
+                        <div className="p-4 mb-6 rounded-lg bg-white dark:bg-header shadow-md border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-heading dark:text-textDark mb-3">
                                 Create New List
                             </h3>
-                            <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex flex-col sm:flex-row gap-3">
                                 <input
                                     type="text"
                                     value={newListName}
@@ -602,21 +595,13 @@ export function UserProfile() {
                                         setNewListName(e.target.value)
                                     }
                                     placeholder="Enter list name"
-                                    className={`flex-1 px-4 py-2 rounded-lg ${
-                                        theme === "dark"
-                                            ? "bg-gray-700 text-white"
-                                            : "bg-gray-100"
-                                    } border ${
-                                        theme === "dark"
-                                            ? "border-gray-600"
-                                            : "border-gray-300"
-                                    }`}
+                                    className="flex-1 px-3 py-2 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-textLight dark:text-textDark focus:outline-none focus:ring-2 focus:ring-heading"
                                     autoFocus
                                 />
                                 <div className="flex gap-2">
                                     <button
                                         onClick={createList}
-                                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                                        className="px-3 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm"
                                     >
                                         Create
                                     </button>
@@ -625,11 +610,7 @@ export function UserProfile() {
                                             setIsCreatingList(false);
                                             setNewListName("");
                                         }}
-                                        className={`px-4 py-2 rounded ${
-                                            theme === "dark"
-                                                ? "bg-gray-700 hover:bg-gray-600"
-                                                : "bg-gray-200 hover:bg-gray-300"
-                                        } transition-colors`}
+                                        className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
                                     >
                                         Cancel
                                     </button>
@@ -639,18 +620,14 @@ export function UserProfile() {
                     )}
 
                     {userLists.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {userLists.map((list) => (
                                 <div
                                     key={list.id}
-                                    className={`p-6 rounded-lg ${
-                                        theme === "dark"
-                                            ? "bg-gray-800"
-                                            : "bg-white border border-gray-200"
-                                    } shadow-lg`}
+                                    className="p-4 rounded-lg bg-white dark:bg-header shadow-md border border-gray-200 dark:border-gray-700"
                                 >
                                     {editingListId === list.id ? (
-                                        <div className="flex items-center mb-4">
+                                        <div className="flex items-center mb-3">
                                             <input
                                                 type="text"
                                                 value={editingListName}
@@ -659,40 +636,32 @@ export function UserProfile() {
                                                         e.target.value
                                                     )
                                                 }
-                                                className={`flex-1 px-4 py-2 rounded-lg mr-2 ${
-                                                    theme === "dark"
-                                                        ? "bg-gray-700 text-white"
-                                                        : "bg-gray-100"
-                                                } border ${
-                                                    theme === "dark"
-                                                        ? "border-gray-600"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className="flex-1 px-3 py-1.5 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-textLight dark:text-textDark focus:outline-none focus:ring-2 focus:ring-heading mr-2"
                                                 autoFocus
                                             />
                                             <button
                                                 onClick={() =>
                                                     updateList(list.id)
                                                 }
-                                                className="text-green-600 hover:text-green-800 mr-2 p-2"
+                                                className="text-green-600 hover:text-green-800 mr-1 p-1"
                                                 title="Save"
                                             >
-                                                <Check size={20} />
+                                                <Check size={18} />
                                             </button>
                                             <button
                                                 onClick={() => {
                                                     setEditingListId(null);
                                                     setEditingListName("");
                                                 }}
-                                                className="text-red-600 hover:text-red-800 p-2"
+                                                className="text-red-600 hover:text-red-800 p-1"
                                                 title="Cancel"
                                             >
-                                                <X size={20} />
+                                                <X size={18} />
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-xl font-semibold flex items-center">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h3 className="text-lg font-semibold text-heading dark:text-textDark flex items-center">
                                                 {list.name}
                                                 {list.is_favorite === 1 && (
                                                     <span className="ml-2 text-yellow-500 text-xs">
@@ -712,10 +681,10 @@ export function UserProfile() {
                                                                     list.name
                                                                 );
                                                             }}
-                                                            className="text-gray-600 hover:text-gray-800 mr-2 p-2"
+                                                            className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mr-1 p-1"
                                                             title="Edit list"
                                                         >
-                                                            <Edit2 size={18} />
+                                                            <Edit2 size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() =>
@@ -723,10 +692,10 @@ export function UserProfile() {
                                                                     list.id
                                                                 )
                                                             }
-                                                            className="text-red-600 hover:text-red-800 p-2"
+                                                            className="text-red-600 hover:text-red-800 p-1"
                                                             title="Delete list"
                                                         >
-                                                            <Trash2 size={18} />
+                                                            <Trash2 size={16} />
                                                         </button>
                                                     </div>
                                                 )}
@@ -734,7 +703,7 @@ export function UserProfile() {
                                     )}
 
                                     {list.games && list.games.length > 0 ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                             {list.games
                                                 .slice(0, 4)
                                                 .map((game) => (
@@ -745,29 +714,25 @@ export function UserProfile() {
                                                 ))}
                                         </div>
                                     ) : (
-                                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                                        <p className="text-gray-500 dark:text-gray-400 text-center py-3">
                                             This list is empty
                                         </p>
                                     )}
 
-                                    <div className="mt-4 text-right">
+                                    <div className="mt-3 text-right">
                                         <Link
                                             to={`/users/${username}/lists/${list.id}/`}
-                                            className="text-primary hover:text-primary-dark transition-colors text-sm font-medium"
+                                            className="text-heading hover:text-[#E00050] transition-colors text-sm font-medium"
                                         >
-                                            View full list →
+                                            View Full List →
                                         </Link>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div
-                            className={`p-6 rounded-lg ${
-                                theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-                            }`}
-                        >
-                            <p className="text-center">
+                        <div className="p-6 rounded-lg bg-gray-100 dark:bg-gray-800 text-center">
+                            <p className="text-textLight dark:text-textDark">
                                 {isOwnProfile
                                     ? "You haven't created any lists yet."
                                     : "This user doesn't have public lists."}
@@ -776,9 +741,9 @@ export function UserProfile() {
                                 <div className="text-center mt-4">
                                     <button
                                         onClick={() => setIsCreatingList(true)}
-                                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors inline-block"
+                                        className="px-4 py-2 bg-heading text-white rounded hover:bg-[#E00050] transition-colors text-sm inline-block"
                                     >
-                                        Create your first list
+                                        Create Your First List
                                     </button>
                                 </div>
                             )}

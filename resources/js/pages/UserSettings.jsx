@@ -11,12 +11,12 @@ export function UserSettings() {
     const { theme } = useTheme();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("profile");
-const [profileData, setProfileData] = useState({
-    name: "",       
-    email: "",
-    bio: "",
-    profile_pic: "",
-});
+    const [profileData, setProfileData] = useState({
+        name: "",
+        email: "",
+        bio: "",
+        profile_pic: "",
+    });
 
     const [passwordData, setPasswordData] = useState({
         current_password: "",
@@ -27,6 +27,8 @@ const [profileData, setProfileData] = useState({
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
 
     useEffect(() => {
         if (!user) {
@@ -34,7 +36,6 @@ const [profileData, setProfileData] = useState({
             return;
         }
 
-        // Initialize profile data with user data
         if (user) {
             setProfileData({
                 name: user.name || "",
@@ -68,18 +69,12 @@ const [profileData, setProfileData] = useState({
         setIsLoading(true);
 
         try {
-            // 1. Verify authentication
             const isAuthenticated = await checkAuth();
-            if (!isAuthenticated) {
-                throw new Error("Session expired");
-            }
+            if (!isAuthenticated) throw new Error("Session expired");
 
-            // 2. Get CSRF token
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 3. Make the profile update request
             const response = await axios.put(
-                // Cambiado de post a put
                 "/api/user/profile",
                 {
                     name: profileData.name,
@@ -92,20 +87,14 @@ const [profileData, setProfileData] = useState({
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                         Accept: "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
                     },
                     withCredentials: true,
                 }
             );
-            
 
             setSuccessMessage("Profile updated successfully");
         } catch (error) {
-            console.error("Profile update error:", {
-                message: error.message,
-                response: error.response,
-                config: error.config,
-            });
+            console.error("Profile update error:", error);
 
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
@@ -127,7 +116,6 @@ const [profileData, setProfileData] = useState({
         setSuccessMessage("");
         setIsLoading(true);
 
-        // Validate passwords
         if (passwordData.password !== passwordData.password_confirmation) {
             setErrors({ password_confirmation: "Passwords do not match" });
             setIsLoading(false);
@@ -135,16 +123,11 @@ const [profileData, setProfileData] = useState({
         }
 
         try {
-            // 1. Verify authentication
             const isAuthenticated = await checkAuth();
-            if (!isAuthenticated) {
-                throw new Error("Session expired");
-            }
+            if (!isAuthenticated) throw new Error("Session expired");
 
-            // 2. Get CSRF token
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 3. Make the password update request
             const response = await axios.post(
                 "/api/user/password",
                 passwordData,
@@ -153,7 +136,6 @@ const [profileData, setProfileData] = useState({
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                         Accept: "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
                     },
                     withCredentials: true,
                 }
@@ -166,11 +148,7 @@ const [profileData, setProfileData] = useState({
                 password_confirmation: "",
             });
         } catch (error) {
-            console.error("Password update error:", {
-                message: error.message,
-                response: error.response,
-                config: error.config,
-            });
+            console.error("Password update error:", error);
 
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
@@ -187,50 +165,26 @@ const [profileData, setProfileData] = useState({
     };
 
     const handleDeleteAccount = async () => {
-        if (
-            !window.confirm(
-                "⚠️ WARNING: This will permanently delete your account and all your data. Are you absolutely sure?"
-            )
-        ) {
-            return;
-        }
+        if (deleteConfirmationText !== "DELETE") return;
 
-        const password = window.prompt(
-            "Please enter your password to confirm deletion:"
-        );
-        if (!password) {
-            return;
-        }
-
+        setIsLoading(true);
         try {
-            setIsLoading(true);
-
-            // 1. Verify authentication
             const isAuthenticated = await checkAuth();
-            if (!isAuthenticated) {
-                throw new Error("Session expired");
-            }
+            if (!isAuthenticated) throw new Error("Session expired");
 
-            // 2. Get CSRF token
             await axios.get("/sanctum/csrf-cookie", { withCredentials: true });
 
-            // 3. Make the delete request
             const response = await axios.delete("/api/user", {
-                data: {
-                    password: password,
-                    confirmation: "DELETE",
-                },
+                data: { confirmation: "DELETE" },
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
                     Accept: "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
                 },
                 withCredentials: true,
             });
 
             if (response.data.success) {
-                alert("Your account has been deleted successfully");
                 await logout();
                 navigate("/", {
                     state: {
@@ -240,11 +194,7 @@ const [profileData, setProfileData] = useState({
                 });
             }
         } catch (error) {
-            console.error("Account deletion error:", {
-                message: error.message,
-                response: error.response,
-                config: error.config,
-            });
+            console.error("Account deletion error:", error);
 
             if (error.response?.status === 401) {
                 alert("Your session has expired. Please log in again.");
@@ -261,47 +211,44 @@ const [profileData, setProfileData] = useState({
         }
     };
 
-    if (!user) {
-        return null; // Will redirect in useEffect
-    }
+    if (!user) return null;
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold text-heading mb-8">
+                Account Settings
+            </h1>
 
-            <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col md:flex-row gap-6">
                 {/* Sidebar */}
-                <div className="md:w-1/4">
+                <div className="md:w-56">
                     <div
-                        className={`p-4 rounded-lg ${
-                            theme === "dark" ? "bg-gray-800" : "bg-white"
-                        } shadow-md`}
+                        className={`p-4 rounded-lg bg-white dark:bg-header shadow-md`}
                     >
-                        <nav className="space-y-2">
+                        <nav className="space-y-1">
                             <button
                                 onClick={() => setActiveTab("profile")}
-                                className={`w-full text-left px-4 py-2 rounded-md ${
+                                className={`w-full text-left px-3 py-2 rounded-md text-sm ${
                                     activeTab === "profile"
-                                        ? "bg-primary text-white"
-                                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        ? "bg-heading text-white"
+                                        : "text-textLight dark:text-textDark hover:bg-gray-100 dark:hover:bg-gray-700"
                                 }`}
                             >
                                 Profile
                             </button>
                             <button
                                 onClick={() => setActiveTab("password")}
-                                className={`w-full text-left px-4 py-2 rounded-md ${
+                                className={`w-full text-left px-3 py-2 rounded-md text-sm ${
                                     activeTab === "password"
-                                        ? "bg-primary text-white"
-                                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        ? "bg-heading text-white"
+                                        : "text-textLight dark:text-textDark hover:bg-gray-100 dark:hover:bg-gray-700"
                                 }`}
                             >
                                 Password
                             </button>
-
                             <button
                                 onClick={() => setActiveTab("danger")}
-                                className={`w-full text-left px-4 py-2 rounded-md ${
+                                className={`w-full text-left px-3 py-2 rounded-md text-sm ${
                                     activeTab === "danger"
                                         ? "bg-red-600 text-white"
                                         : "text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30"
@@ -314,11 +261,9 @@ const [profileData, setProfileData] = useState({
                 </div>
 
                 {/* Main Content */}
-                <div className="md:w-3/4">
+                <div className="flex-1">
                     <div
-                        className={`p-6 rounded-lg ${
-                            theme === "dark" ? "bg-gray-800" : "bg-white"
-                        } shadow-md`}
+                        className={`p-6 rounded-lg bg-white dark:bg-header shadow-md`}
                     >
                         {successMessage && (
                             <div className="mb-4 p-3 rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -335,7 +280,7 @@ const [profileData, setProfileData] = useState({
                         {/* Profile Settings */}
                         {activeTab === "profile" && (
                             <form onSubmit={handleProfileSubmit}>
-                                <h2 className="text-xl font-semibold mb-6">
+                                <h2 className="text-xl font-semibold text-heading dark:text-textDark mb-6">
                                     Profile Settings
                                 </h2>
 
@@ -347,10 +292,10 @@ const [profileData, setProfileData] = useState({
                                                 "/images/default-avatar.png"
                                             }
                                             alt="Avatar"
-                                            className="w-24 h-24 rounded-full object-cover mr-4"
+                                            className="w-20 h-20 rounded-full object-cover mr-4"
                                         />
                                         <div className="flex-1">
-                                            <label className="block text-sm font-medium mb-2">
+                                            <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                                 Profile Picture URL
                                             </label>
                                             <input
@@ -359,13 +304,13 @@ const [profileData, setProfileData] = useState({
                                                 value={profileData.profile_pic}
                                                 onChange={handleProfileChange}
                                                 placeholder="https://example.com/profile.jpg"
-                                                className={`w-full p-3 rounded-md ${
+                                                className={`w-full p-2 rounded-md border ${
                                                     theme === "dark"
-                                                        ? "bg-gray-700 border-gray-600"
-                                                        : "bg-white border-gray-300"
-                                                } border focus:outline-none focus:ring-2 focus:ring-primary ${
+                                                        ? "bg-gray-700 border-gray-600 text-textDark"
+                                                        : "bg-white border-gray-300 text-textLight"
+                                                } focus:outline-none focus:ring-2 focus:ring-heading ${
                                                     errors.profile_pic
-                                                        ? "border-red-500 focus:ring-red-500"
+                                                        ? "border-red-500"
                                                         : ""
                                                 }`}
                                             />
@@ -379,26 +324,20 @@ const [profileData, setProfileData] = useState({
                                 </div>
 
                                 <div className="mb-4">
-                                    <label
-                                        htmlFor="name"
-                                        className="block text-sm font-medium mb-2"
-                                    >
-                                        name
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
+                                        Name
                                     </label>
                                     <input
-                                        id="name"
                                         name="name"
                                         type="text"
                                         value={profileData.name}
                                         onChange={handleProfileChange}
-                                        className={`w-full p-3 rounded-md ${
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
-                                            errors.name
-                                                ? "border-red-500 focus:ring-red-500"
-                                                : ""
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
+                                            errors.name ? "border-red-500" : ""
                                         }`}
                                     />
                                     {errors.name && (
@@ -409,26 +348,20 @@ const [profileData, setProfileData] = useState({
                                 </div>
 
                                 <div className="mb-4">
-                                    <label
-                                        htmlFor="email"
-                                        className="block text-sm font-medium mb-2"
-                                    >
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                         Email
                                     </label>
                                     <input
-                                        id="email"
                                         name="email"
                                         type="email"
                                         value={profileData.email}
                                         onChange={handleProfileChange}
-                                        className={`w-full p-3 rounded-md ${
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
-                                            errors.email
-                                                ? "border-red-500 focus:ring-red-500"
-                                                : ""
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
+                                            errors.email ? "border-red-500" : ""
                                         }`}
                                     />
                                     {errors.email && (
@@ -439,29 +372,22 @@ const [profileData, setProfileData] = useState({
                                 </div>
 
                                 <div className="mb-6">
-                                    <label
-                                        htmlFor="bio"
-                                        className="block text-sm font-medium mb-2"
-                                    >
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                         Bio
                                     </label>
                                     <textarea
-                                        id="bio"
                                         name="bio"
                                         value={profileData.bio}
                                         onChange={handleProfileChange}
-                                        rows={4}
-                                        className={`w-full p-3 rounded-md ${
+                                        rows={3}
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
-                                            errors.bio
-                                                ? "border-red-500 focus:ring-red-500"
-                                                : ""
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
+                                            errors.bio ? "border-red-500" : ""
                                         }`}
-                                        placeholder="Tell us about yourself..."
-                                    ></textarea>
+                                    />
                                     {errors.bio && (
                                         <p className="mt-1 text-sm text-red-500">
                                             {errors.bio}
@@ -472,7 +398,7 @@ const [profileData, setProfileData] = useState({
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+                                    className="px-4 py-2 bg-heading text-white rounded-md hover:bg-[#E00050] focus:outline-none focus:ring-2 focus:ring-heading focus:ring-offset-2 disabled:opacity-50"
                                 >
                                     {isLoading ? "Saving..." : "Save Changes"}
                                 </button>
@@ -482,30 +408,26 @@ const [profileData, setProfileData] = useState({
                         {/* Password Settings */}
                         {activeTab === "password" && (
                             <form onSubmit={handlePasswordSubmit}>
-                                <h2 className="text-xl font-semibold mb-6">
+                                <h2 className="text-xl font-semibold text-heading dark:text-textDark mb-6">
                                     Change Password
                                 </h2>
 
                                 <div className="mb-4">
-                                    <label
-                                        htmlFor="current_password"
-                                        className="block text-sm font-medium mb-2"
-                                    >
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                         Current Password
                                     </label>
                                     <input
-                                        id="current_password"
                                         name="current_password"
                                         type="password"
                                         value={passwordData.current_password}
                                         onChange={handlePasswordChange}
-                                        className={`w-full p-3 rounded-md ${
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
                                             errors.current_password
-                                                ? "border-red-500 focus:ring-red-500"
+                                                ? "border-red-500"
                                                 : ""
                                         }`}
                                     />
@@ -517,25 +439,21 @@ const [profileData, setProfileData] = useState({
                                 </div>
 
                                 <div className="mb-4">
-                                    <label
-                                        htmlFor="password"
-                                        className="block text-sm font-medium mb-2"
-                                    >
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                         New Password
                                     </label>
                                     <input
-                                        id="password"
                                         name="password"
                                         type="password"
                                         value={passwordData.password}
                                         onChange={handlePasswordChange}
-                                        className={`w-full p-3 rounded-md ${
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
                                             errors.password
-                                                ? "border-red-500 focus:ring-red-500"
+                                                ? "border-red-500"
                                                 : ""
                                         }`}
                                     />
@@ -547,27 +465,23 @@ const [profileData, setProfileData] = useState({
                                 </div>
 
                                 <div className="mb-6">
-                                    <label
-                                        htmlFor="password_confirmation"
-                                        className="block text-sm font-medium mb-2"
-                                    >
+                                    <label className="block text-sm font-medium text-textLight dark:text-textDark mb-2">
                                         Confirm New Password
                                     </label>
                                     <input
-                                        id="password_confirmation"
                                         name="password_confirmation"
                                         type="password"
                                         value={
                                             passwordData.password_confirmation
                                         }
                                         onChange={handlePasswordChange}
-                                        className={`w-full p-3 rounded-md ${
+                                        className={`w-full p-2 rounded-md border ${
                                             theme === "dark"
-                                                ? "bg-gray-700 border-gray-600"
-                                                : "bg-white border-gray-300"
-                                        } border focus:outline-none focus:ring-2 focus:ring-primary ${
+                                                ? "bg-gray-700 border-gray-600 text-textDark"
+                                                : "bg-white border-gray-300 text-textLight"
+                                        } focus:outline-none focus:ring-2 focus:ring-heading ${
                                             errors.password_confirmation
-                                                ? "border-red-500 focus:ring-red-500"
+                                                ? "border-red-500"
                                                 : ""
                                         }`}
                                     />
@@ -581,7 +495,7 @@ const [profileData, setProfileData] = useState({
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+                                    className="px-4 py-2 bg-heading text-white rounded-md hover:bg-[#E00050] focus:outline-none focus:ring-2 focus:ring-heading focus:ring-offset-2 disabled:opacity-50"
                                 >
                                     {isLoading
                                         ? "Updating..."
@@ -593,34 +507,80 @@ const [profileData, setProfileData] = useState({
                         {/* Danger Zone */}
                         {activeTab === "danger" && (
                             <div>
-                                <h2 className="text-xl font-semibold mb-6 text-red-600">
+                                <h2 className="text-xl font-semibold text-red-600 mb-6">
                                     Danger Zone
                                 </h2>
 
                                 <div
-                                    className={`p-4 rounded-md border border-red-300 ${
-                                        theme === "dark"
-                                            ? "bg-red-900/20"
-                                            : "bg-red-50"
-                                    }`}
+                                    className={`p-4 rounded-md border border-red-300 bg-red-50 dark:bg-red-900/20`}
                                 >
                                     <h3 className="text-lg font-medium text-red-600 mb-2">
                                         Delete Account
                                     </h3>
-                                    <p className="mb-4 text-gray-600 dark:text-gray-400">
+                                    <p className="mb-4 text-textLight dark:text-textDark">
                                         Once you delete your account, there is
                                         no going back. All your data will be
                                         permanently removed. Please be certain.
                                     </p>
-                                    <button
-                                        onClick={handleDeleteAccount}
-                                        disabled={isLoading}
-                                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
-                                    >
-                                        {isLoading
-                                            ? "Deleting..."
-                                            : "Delete Account Permanently"}
-                                    </button>
+
+                                    {!showDeleteConfirmation ? (
+                                        <button
+                                            onClick={() =>
+                                                setShowDeleteConfirmation(true)
+                                            }
+                                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                        >
+                                            Delete Account Permanently
+                                        </button>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <p className="text-red-600 font-medium">
+                                                Type "DELETE" to confirm account
+                                                deletion:
+                                            </p>
+                                            <input
+                                                type="text"
+                                                value={deleteConfirmationText}
+                                                onChange={(e) =>
+                                                    setDeleteConfirmationText(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-full p-2 border rounded-md"
+                                                placeholder="Type DELETE"
+                                            />
+                                            <div className="flex space-x-3">
+                                                <button
+                                                    onClick={
+                                                        handleDeleteAccount
+                                                    }
+                                                    disabled={
+                                                        deleteConfirmationText !==
+                                                            "DELETE" ||
+                                                        isLoading
+                                                    }
+                                                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 flex-1"
+                                                >
+                                                    {isLoading
+                                                        ? "Deleting..."
+                                                        : "Confirm Deletion"}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setShowDeleteConfirmation(
+                                                            false
+                                                        );
+                                                        setDeleteConfirmationText(
+                                                            ""
+                                                        );
+                                                    }}
+                                                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex-1"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
