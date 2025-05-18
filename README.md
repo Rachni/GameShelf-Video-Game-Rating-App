@@ -60,10 +60,6 @@ GameShelf is a web application designed for video game enthusiasts to track thei
 
 ### 📌 GitHub Project Description
 GameShelf is a video game review and tracking web app built with Laravel (PHP) and React. It allows users to rate games, create lists, and discover new titles. The project showcases modern web development techniques, including API integration, authentication, and responsive design.
-
-### 🔖 Recommended GitHub Tags
-`web-development` `laravel` `react` `tailwindcss` `video-games` `api-integration` `mysql` `authentication`
-
 ---
 
 ## 📌 Versión en Español
