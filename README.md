@@ -9,6 +9,27 @@
 ### Description
 GameShelf is a web application designed for video game enthusiasts to track their gaming progress, create personalized lists, write reviews, and discover new games. Inspired by platforms like Letterboxd and Goodreads, GameShelf offers a user-friendly interface with social features, game discovery, and personalized statistics.
 
+---
+
+## 🎥 DEMO
+
+### 🌗 Main Interface: Landing Page + Dark/Light Mode  
+> Includes a dark/light mode toggle and interactive card-based design with hover effects for browsing games.
+![Landing and responsive design](https://i.imgur.com/tHTx7cb.gif)
+
+### 🔍 Real-Time Game Search  
+> Search games instantly, uses the RAWG API to deliver info about 500,000+ games.
+![Game search in action](https://i.imgur.com/LrCKK8X.gif)
+
+### 🎮 Game Page: Add to Lists + Review System  
+> Detailed game view showing game info, user lists, and a built-in review system with star ratings. Easily add games to custom lists and submit your own reviews.  
+![Game details, user lists, and review submission](https://i.imgur.com/iIHfZd1.gif)
+
+### 👤 User Profile + Personalized Stats  
+> Personalized user profile with detailed stats, favorite games, custom lists, and profile customization options.
+![User profile with statistics and custom lists](https://i.imgur.com/U4RLM7x.gif)
+
+---
 ### 🚀 Technologies Used
 - **Frontend:** React, Tailwind CSS, Vite  
 - **Backend:** Laravel (PHP)  
@@ -113,3 +134,23 @@ Para ejecutar el proyecto localmente, sigue estos pasos:
 - Backend: Arquitectura MVC con Laravel (controladores, modelos y migraciones).  
 - Frontend: Componentes React con Tailwind CSS para estilos.  
 - Integración de API: RAWG API para obtener datos de juegos (guardados en la base de datos).
+
+---
+
+## 🎥 Demostración en Vivo
+
+### 🌗 Interfaz Principal: Página de Inicio + Modo Claro/Oscuro  
+> Una vista rápida de la página de inicio con un diseño limpio y responsivo. Incluye cambio entre modo claro/oscuro y tarjetas interactivas.  
+![Diseño landing y responsivo](https://i.imgur.com/tHTx7cb.gif)
+
+### 🔍 Búsqueda en Tiempo Real  
+> Búsqueda de juegos mediante la API de RAWG. Los resultados se almacenan en la base de datos para un acceso más rápido.  
+![Búsqueda de juegos en acción](https://i.imgur.com/LrCKK8X.gif)
+
+### 🎮 Página de Juego: Añadir a Listas + Sistema de Reseñas  
+> Vista detallada de un juego con su información, opciones para añadirlo a listas y sistema de reseñas con puntuación por estrellas.  
+![Detalles de juego, listas y reseñas](https://i.imgur.com/iIHfZd1.gif)
+
+### 👤 Perfil de Usuario + Estadísticas  
+> Perfil personalizado con estadísticas de juegos, favoritos, listas personalizadas y personalización del diseño.  
+![Perfil de usuario con estadísticas](https://i.imgur.com/U4RLM7x.gif)
